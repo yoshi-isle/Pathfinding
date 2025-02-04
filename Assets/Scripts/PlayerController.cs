@@ -24,7 +24,11 @@ public class PlayerController : MonoBehaviour
         {
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
             {
-                targetTile = new Vector2(Mathf.Round(hit.point.x), Mathf.Round(hit.point.z));
+                Vector2 gridLocation = WorldGrid.instance.WorldLocationToGrid(hit.point);
+                if (WorldGrid.instance.InBounds(gridLocation))
+                {
+                    targetTile = new Vector2(Mathf.Round(hit.point.x), Mathf.Round(hit.point.z));
+                }
             }
         }
 
@@ -44,7 +48,7 @@ public class PlayerController : MonoBehaviour
 
     void OnTick()
     {
-        print("path!");
+        // TODO - If not already at destination
         currentPath = AStarPathfinder.instance.FindPath(new Vector2(transform.position.x, transform.position.z), targetTile);
     }
 

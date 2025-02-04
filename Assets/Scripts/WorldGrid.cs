@@ -40,4 +40,14 @@ public class WorldGrid : MonoBehaviour
             LayerMask.GetMask("Blocker")
         );
     }
+
+    public Vector2 WorldLocationToGrid(Vector3 worldLocation)
+    {
+        return new Vector2(Mathf.Round(worldLocation.x), Mathf.Round(worldLocation.z));
+    }
+
+    public bool InBounds(Vector2 worldLocation)
+    {
+        return worldLocation.x >= 0 && worldLocation.x <= gridSize.x && worldLocation.y >= 0 && worldLocation.y <= gridSize.y;
+    }
 }
