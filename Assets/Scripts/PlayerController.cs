@@ -57,8 +57,8 @@ public class PlayerController : MonoBehaviour
 
             if (currentPath != null && currentPath.Count > 1)
             {
-                Vector2 nextPos = currentPath[1];
-                transform.position = new Vector3(nextPos.x, transform.position.y, nextPos.y);
+                currentPath.RemoveAt(0);
+                transform.position = new Vector3(currentPath.First().x, transform.position.y, currentPath.First().y);
             }
         }
         else
