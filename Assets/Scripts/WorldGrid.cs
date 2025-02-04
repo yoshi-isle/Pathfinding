@@ -48,6 +48,6 @@ public class WorldGrid : MonoBehaviour
 
     public bool InBounds(Vector2 worldLocation)
     {
-        return worldLocation.x >= 0 && worldLocation.x <= gridSize.x && worldLocation.y >= 0 && worldLocation.y <= gridSize.y;
+        return worldLocation.x >= 0 && worldLocation.x <= gridSize.x - 1 && worldLocation.y >= 0 && worldLocation.y <= gridSize.y - 1;
     }
 }

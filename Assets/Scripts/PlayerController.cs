@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.startWidth = 0.1f;
+        lineRenderer.startWidth = 0.2f;
         lineRenderer.endWidth = 0.1f;
         lineRenderer.positionCount = 0;
         lineRenderer.material = new Material(Shader.Find("Sprites/Default")) { color = Color.magenta };
@@ -48,8 +48,23 @@ public class PlayerController : MonoBehaviour
 
     void OnTick()
     {
-        // TODO - If not already at destination
-        currentPath = AStarPathfinder.instance.FindPath(new Vector2(transform.position.x, transform.position.z), targetTile);
+        Vector2 currentPos = new(transform.position.x, transform.position.z);
+
+        // Only find new path if we're not at the target
+        if (currentPos != targetTile)
+        {
+            currentPath = AStarPathfinder.instance.FindPath(currentPos, targetTile);
+
+            if (currentPath != null && currentPath.Count > 1)
+            {
+                Vector2 nextPos = currentPath[1];
+                transform.position = new Vector3(nextPos.x, transform.position.y, nextPos.y);
+            }
+        }
+        else
+        {
+            currentPath.Clear();
+        }
     }
 
     void OnDrawGizmos()

@@ -97,16 +97,16 @@ public class AStarPathfinder : MonoBehaviour
 
     private List<Vector2> GetNeighbors(Vector2 node)
     {
-        List<Vector2> neighbors = new List<Vector2>
+        List<Vector2> neighbors = new()
         {
-            new Vector2(node.x + 1, node.y),
-            new Vector2(node.x - 1, node.y),
-            new Vector2(node.x, node.y + 1),
-            new Vector2(node.x, node.y - 1),
-            new Vector2(node.x + 1, node.y + 1),
-            new Vector2(node.x - 1, node.y - 1),
-            new Vector2(node.x + 1, node.y - 1),
-            new Vector2(node.x - 1, node.y + 1)
+            new(node.x + 1, node.y),
+            new(node.x - 1, node.y),
+            new(node.x, node.y + 1),
+            new(node.x, node.y - 1),
+            new(node.x + 1, node.y + 1),
+            new(node.x - 1, node.y - 1),
+            new(node.x + 1, node.y - 1),
+            new(node.x - 1, node.y + 1)
         };
         return neighbors;
     }
