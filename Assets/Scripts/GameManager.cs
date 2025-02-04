@@ -1,4 +1,40 @@
-using Unity.VisualScripting;
+using System;
+using System.Collections;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour { }
+public class GameManager : MonoBehaviour
+{
+    public delegate void TickEventHandler();
+    public static GameManager Instance { get; private set; }
+    public event Action OnTick;
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogError($"Multiple GameManager instances detected. Destroying duplicate on {gameObject.name}");
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        StartCoroutine(TickEvent());
+    }
+
+    IEnumerator TickEvent()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.42f);
+            OnTick?.Invoke();
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+}

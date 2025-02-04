@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private Vector2 targetTile;
-    public UnitController uc;
     public List<Vector2> currentPath;
     public LineRenderer lineRenderer;
 
@@ -16,6 +15,7 @@ public class PlayerController : MonoBehaviour
         lineRenderer.endWidth = 0.1f;
         lineRenderer.positionCount = 0;
         lineRenderer.material = new Material(Shader.Find("Sprites/Default")) { color = Color.magenta };
+        GameManager.Instance.OnTick += OnTick;
     }
 
     void Update()
@@ -25,7 +25,6 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
             {
                 targetTile = new Vector2(Mathf.Round(hit.point.x), Mathf.Round(hit.point.z));
-                currentPath = uc.FindPath(new Vector2(transform.position.x, transform.position.z), targetTile);
             }
         }
 
@@ -41,6 +40,12 @@ public class PlayerController : MonoBehaviour
         {
             lineRenderer.positionCount = 0;
         }
+    }
+
+    void OnTick()
+    {
+        print("path!");
+        currentPath = AStarPathfinder.instance.FindPath(new Vector2(transform.position.x, transform.position.z), targetTile);
     }
 
     void OnDrawGizmos()

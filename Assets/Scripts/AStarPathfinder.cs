@@ -1,11 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 
-public class UnitController : MonoBehaviour
+public class AStarPathfinder : MonoBehaviour
 {
     public Vector2 target;
     private List<Vector2> path;
+    public static AStarPathfinder instance;
+
+    public void Start()
+    {
+        instance = this;
+    }
 
     public List<Vector2> FindPath(Vector2 start, Vector2 goal)
     {
