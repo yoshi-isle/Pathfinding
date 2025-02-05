@@ -11,10 +11,11 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.startWidth = 0.2f;
+        lineRenderer.startWidth = 0.1f;
         lineRenderer.endWidth = 0.1f;
         lineRenderer.positionCount = 0;
         lineRenderer.material = new Material(Shader.Find("Sprites/Default")) { color = Color.magenta };
+        targetTile = WorldGrid.instance.WorldLocationToGrid(transform.position);
         GameManager.Instance.OnTick += OnTick;
     }
 
