@@ -6,15 +6,9 @@ public class PlayerController : MonoBehaviour
 {
     private Vector2 targetTile;
     public List<Vector2> currentPath;
-    public LineRenderer lineRenderer;
 
     void Start()
     {
-        lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.startWidth = 0.1f;
-        lineRenderer.endWidth = 0.1f;
-        lineRenderer.positionCount = 0;
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default")) { color = Color.magenta };
         targetTile = WorldGrid.instance.WorldLocationToGrid(transform.position);
         GameManager.Instance.OnTick += OnTick;
     }
@@ -31,19 +25,6 @@ public class PlayerController : MonoBehaviour
                     targetTile = new Vector2(Mathf.Round(hit.point.x), Mathf.Round(hit.point.z));
                 }
             }
-        }
-
-        if (currentPath.Count != 0)
-        {
-            lineRenderer.positionCount = currentPath.Count;
-            for (int i = 0; i < currentPath.Count; i++)
-            {
-                lineRenderer.SetPosition(i, new Vector3(currentPath[i].x, 0, currentPath[i].y));
-            }
-        }
-        else
-        {
-            lineRenderer.positionCount = 0;
         }
     }
 
