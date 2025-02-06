@@ -10,7 +10,6 @@ public class PlayerGraphicsController : MonoBehaviour
     void Update()
     {
         float movementSpeed = velocity.magnitude / Time.deltaTime;
-        print(movementSpeed);
         animator.SetFloat("MovementSpeed", movementSpeed);
         transform.position = Vector3.SmoothDamp(transform.position, follow.transform.position, ref velocity, smoothTime);
 

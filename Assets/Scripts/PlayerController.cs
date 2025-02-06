@@ -1,37 +1,67 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private Vector2 targetTile;
+    public bool DrawGizmos;
+    public Request request;
+    public Vector2 targetTile;
     public List<Vector2> currentPath;
+    public PlayerState playerState;
+    public enum PlayerState
+    {
+        Idle,
+        Walking
+    }
 
     void Start()
     {
+        playerState = PlayerState.Idle;
         targetTile = WorldGrid.instance.WorldLocationToGrid(transform.position);
         GameManager.Instance.OnTick += OnTick;
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        // Listen for inputs
+        switch (playerState)
         {
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
-            {
-                Vector2 gridLocation = WorldGrid.instance.WorldLocationToGrid(hit.point);
-                if (WorldGrid.instance.InBoundsAndWalkable(gridLocation))
-                {
-                    targetTile = new Vector2(Mathf.Round(hit.point.x), Mathf.Round(hit.point.z));
-                }
-            }
+            case PlayerState.Idle:
+                ListenForWorldClicks();
+                break;
+            case PlayerState.Walking:
+                ListenForWorldClicks();
+                break;
+            default:
+                break;
         }
     }
 
     void OnTick()
     {
-        Vector2 currentPos = new(transform.position.x, transform.position.z);
+        // Process any state change requests
+        ProcessPreTickStateChangeRequest();
 
+        // Process actions on the tick
+        switch (playerState)
+        {
+            case PlayerState.Idle:
+                break;
+            case PlayerState.Walking:
+                HandleWalk();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void HandleWalk()
+    {
+        playerState = PlayerState.Walking;
+        Vector2 currentPos = new(transform.position.x, transform.position.z);
         // Only find new path if we're not at the target
         if (currentPos != targetTile)
         {
@@ -51,21 +81,67 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            playerState = PlayerState.Idle;
             currentPath.Clear();
+        }
+    }
+
+    private void ProcessPreTickStateChangeRequest()
+    {
+        if (request == null) return;
+
+        switch (playerState)
+        {
+            case PlayerState.Idle:
+                if (request is WorldClickRequest worldClickRequest)
+                {
+                    playerState = PlayerState.Walking;
+                    targetTile = new Vector2(Mathf.Round(worldClickRequest.X), Mathf.Round(worldClickRequest.Y));
+                }
+                request = null;
+                break;
+            case PlayerState.Walking:
+                if (request is WorldClickRequest worldClickRequest2)
+                {
+                    playerState = PlayerState.Walking;
+                    targetTile = new Vector2(Mathf.Round(worldClickRequest2.X), Mathf.Round(worldClickRequest2.Y));
+                }
+                request = null;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void ListenForWorldClicks()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
+            {
+                Vector2 gridLocation = WorldGrid.instance.WorldLocationToGrid(hit.point);
+                if (WorldGrid.instance.InBoundsAndWalkable(gridLocation))
+                {
+                    request = new WorldClickRequest(gridLocation.x, gridLocation.y);
+                }
+            }
         }
     }
 
     void OnDrawGizmos()
     {
-        Gizmos.DrawCube(new(targetTile.x, 0, targetTile.y), new(1, 1, 1));
-
-        if (currentPath.Count != 0)
+        if (DrawGizmos)
         {
-            Gizmos.color = Color.magenta;
+            Gizmos.DrawCube(new(targetTile.x, 0, targetTile.y), new(1, 1, 1));
 
-            foreach (var tile in currentPath)
+            if (currentPath.Count != 0)
             {
-                Gizmos.DrawCube(new(tile.x, 0, tile.y), new(0.9f, 0.9f, 0.9f));
+                Gizmos.color = Color.magenta;
+
+                foreach (var tile in currentPath)
+                {
+                    Gizmos.DrawCube(new(tile.x, 0, tile.y), new(0.9f, 0.9f, 0.9f));
+                }
             }
         }
     }
