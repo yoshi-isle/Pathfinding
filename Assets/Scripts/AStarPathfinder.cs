@@ -129,11 +129,11 @@ public class AStarPathfinder : MonoBehaviour
             Gizmos.color = Color.red;
             foreach (Vector2 point in path)
             {
-                Gizmos.DrawCube(new Vector3(point.x, 0, point.y), Vector3.one * 0.5f);
+                Gizmos.DrawCube(new Vector3(point.x, 0, point.y), Vector3.one * 0.2f);
             }
         }
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawCube(new Vector3(target.x, 0, target.y), new Vector3(0.5f, 15f, 0.5f));
+        Gizmos.DrawCube(new Vector3(target.x, 0, target.y), new Vector3(0.2f, 3f, 0.2f));
     }
 }

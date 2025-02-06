@@ -243,7 +243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f1dee3f7e5db5f48b4d55ee6a5eaa23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DrawGizmos: 0
+  DrawGizmos: 1
   targetTile: {x: 0, y: 0}
   currentPath: []
   playerState: 0

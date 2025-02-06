@@ -17,7 +17,7 @@ public class TileHoverIndicator : MonoBehaviour
             if (WorldGrid.instance.InBoundsAndWalkable(gridLocation))
             {
                 Toggle = true;
-                transform.position = new Vector3(Mathf.Round(hit.point.x), 0.1f, Mathf.Round(hit.point.z));
+                transform.position = new Vector3(Mathf.Round(hit.point.x), 0.03f, Mathf.Round(hit.point.z));
             }
             else
             {

@@ -12,6 +12,6 @@ public class PlayerTrueTileIndicator : MonoBehaviour
 
     private void OnTick()
     {
-        transform.position = new(follow.position.x, 0.1f, follow.position.z);
+        transform.position = new(follow.position.x, 0.03f, follow.position.z);
     }
 }

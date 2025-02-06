@@ -131,15 +131,14 @@ public class PlayerController : MonoBehaviour
     {
         if (DrawGizmos)
         {
-            Gizmos.DrawCube(new(targetTile.x, 0, targetTile.y), new(1, 1, 1));
-
+            Gizmos.DrawSphere(new(targetTile.x, 0, targetTile.y), 0.2f);
             if (currentPath.Count != 0)
             {
                 Gizmos.color = Color.magenta;
 
                 foreach (var tile in currentPath)
                 {
-                    Gizmos.DrawCube(new(tile.x, 0, tile.y), new(0.9f, 0.9f, 0.9f));
+                    Gizmos.DrawSphere(new(tile.x, 0, tile.y), 0.2f);
                 }
             }
         }

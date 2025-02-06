@@ -24,7 +24,7 @@ public class WorldGrid : MonoBehaviour
                 {
                     Gizmos.color = Color.red;
                 }
-                Gizmos.DrawWireCube(new(x, 0, y), new(0.5f, 0.5f, 0.5f));
+                Gizmos.DrawWireSphere(new(x, 0, y), 0.3f);
             }
         }
     }
