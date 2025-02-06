@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public Vector2 targetTile;
     public List<Vector2> currentPath;
     public PlayerState playerState;
+    public Vector2 GridLocation => new(transform.position.x, transform.position.z);
+
     public enum PlayerState
     {
         Idle,
@@ -60,13 +62,9 @@ public class PlayerController : MonoBehaviour
 
     void HandleWalk()
     {
-        playerState = PlayerState.Walking;
-        Vector2 currentPos = new(transform.position.x, transform.position.z);
-        // Only find new path if we're not at the target
-        if (currentPos != targetTile)
+        // Move along path if we're not at the target
+        if (GridLocation != targetTile)
         {
-            currentPath = AStarPathfinder.instance.FindPath(currentPos, targetTile);
-
             // Impossible path
             if (currentPath.Count == 0)
             {
@@ -97,14 +95,15 @@ public class PlayerController : MonoBehaviour
                 {
                     playerState = PlayerState.Walking;
                     targetTile = new Vector2(Mathf.Round(worldClickRequest.X), Mathf.Round(worldClickRequest.Y));
+                    currentPath = AStarPathfinder.instance.FindPath(GridLocation, targetTile);
                 }
                 request = null;
                 break;
             case PlayerState.Walking:
                 if (request is WorldClickRequest worldClickRequest2)
                 {
-                    playerState = PlayerState.Walking;
                     targetTile = new Vector2(Mathf.Round(worldClickRequest2.X), Mathf.Round(worldClickRequest2.Y));
+                    currentPath = AStarPathfinder.instance.FindPath(GridLocation, targetTile);
                 }
                 request = null;
                 break;
