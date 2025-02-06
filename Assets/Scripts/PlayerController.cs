@@ -13,7 +13,6 @@ public class PlayerController : MonoBehaviour
     public List<Vector2> currentPath;
     public PlayerState playerState;
     public Vector2 GridLocation => new(transform.position.x, transform.position.z);
-    private List<GameObject> pathPlanes = new();
 
     public enum PlayerState
     {
@@ -143,37 +142,6 @@ public class PlayerController : MonoBehaviour
                     Gizmos.DrawSphere(new(tile.x, 0, tile.y), 0.2f);
                 }
             }
-
-            DrawPath();
-        }
-    }
-
-    private void DrawPath()
-    {
-        // Clear old path planes
-        if (pathPlanes != null)
-        {
-            foreach (var plane in pathPlanes)
-            {
-                DestroyImmediate(plane);
-            }
-            pathPlanes.Clear();
-        }
-
-        if (currentPath == null || currentPath.Count == 0) return;
-
-        // Create a transparent yellow material
-        Material pathMaterial = new Material(Shader.Find("Standard"));
-        pathMaterial.color = new Color(1, 1, 0, 0.3f); // Transparent yellow
-
-        foreach (var tile in currentPath)
-        {
-            // Instantiate a plane
-            GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            plane.transform.position = new Vector3(tile.x, 0.1f, tile.y); // Slightly above the ground
-            plane.transform.rotation = Quaternion.Euler(90, 0, 0); // Rotate to be horizontal
-            plane.GetComponent<MeshRenderer>().material = pathMaterial;
-            pathPlanes.Add(plane);
         }
     }
 }
