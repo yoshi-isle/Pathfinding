@@ -14,7 +14,7 @@ public class TileHoverIndicator : MonoBehaviour
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
         {
             Vector2 gridLocation = WorldGrid.instance.WorldLocationToGrid(hit.point);
-            if (WorldGrid.instance.InBounds(gridLocation))
+            if (WorldGrid.instance.InBoundsAndWalkable(gridLocation))
             {
                 Toggle = true;
                 transform.position = new Vector3(Mathf.Round(hit.point.x), 0.1f, Mathf.Round(hit.point.z));

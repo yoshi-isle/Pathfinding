@@ -46,8 +46,9 @@ public class WorldGrid : MonoBehaviour
         return new Vector2(Mathf.Round(worldLocation.x), Mathf.Round(worldLocation.z));
     }
 
-    public bool InBounds(Vector2 worldLocation)
+    public bool InBoundsAndWalkable(Vector2 worldLocation)
     {
-        return worldLocation.x >= 0 && worldLocation.x <= gridSize.x - 1 && worldLocation.y >= 0 && worldLocation.y <= gridSize.y - 1;
+
+        return Walkable(worldLocation) && worldLocation.x >= 0 && worldLocation.x <= gridSize.x - 1 && worldLocation.y >= 0 && worldLocation.y <= gridSize.y - 1;
     }
 }
