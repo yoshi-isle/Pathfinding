@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     public bool DrawGizmos;
     public Request request;
     public Vector2 targetTile;
-    public List<Vector2> currentPath;
+    public Stack<Vector2> currentPath;
     public PlayerState playerState;
     public Vector2 GridLocation => new(transform.position.x, transform.position.z);
 
@@ -74,8 +74,8 @@ public class PlayerController : MonoBehaviour
 
             if (currentPath != null && currentPath.Count > 1)
             {
-                currentPath.RemoveAt(0);
-                transform.position = new Vector3(currentPath.First().x, transform.position.y, currentPath.First().y);
+                currentPath.Pop();
+                transform.position = new Vector3(currentPath.Peek().x, transform.position.y, currentPath.Peek().y);
             }
         }
         else
@@ -96,7 +96,7 @@ public class PlayerController : MonoBehaviour
                 {
                     playerState = PlayerState.Walking;
                     targetTile = new Vector2(Mathf.Round(worldClickRequest.X), Mathf.Round(worldClickRequest.Y));
-                    currentPath = AStarPathfinder.instance.FindPath(GridLocation, targetTile);
+                    currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
                 }
                 request = null;
                 break;
@@ -104,7 +104,7 @@ public class PlayerController : MonoBehaviour
                 if (request is WorldClickRequest worldClickRequest2)
                 {
                     targetTile = new Vector2(Mathf.Round(worldClickRequest2.X), Mathf.Round(worldClickRequest2.Y));
-                    currentPath = AStarPathfinder.instance.FindPath(GridLocation, targetTile);
+                    currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
                 }
                 request = null;
                 break;

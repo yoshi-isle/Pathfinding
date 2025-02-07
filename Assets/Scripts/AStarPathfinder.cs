@@ -1,61 +1,45 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 public class AStarPathfinder : MonoBehaviour
 {
     public Vector2 target;
     private List<Vector2> path;
-    public static AStarPathfinder instance;
 
-    public void Start()
+    public static Stack<Vector2> FindPath(Vector2 start, Vector2 goal)
     {
-        instance = this;
-    }
+        List<Vector2> openSet = new() { start };
+        HashSet<Vector2> closedSet = new();
+        Dictionary<Vector2, Vector2> cameFrom = new();
+        Dictionary<Vector2, float> gScore = new() { { start, 0 } };
+        Dictionary<Vector2, float> fScore = new() { { start, Heuristic(start, goal) } };
 
-    public List<Vector2> FindPath(Vector2 start, Vector2 goal)
-    {
-        start = new Vector2(Mathf.Ceil(start.x), Mathf.Ceil(start.y));
-        goal = new Vector2(Mathf.Ceil(goal.x), Mathf.Ceil(goal.y));
-        List<Vector2> openSet = new List<Vector2> { start };
-        HashSet<Vector2> closedSet = new HashSet<Vector2>();
-        Dictionary<Vector2, Vector2> cameFrom = new Dictionary<Vector2, Vector2>();
-        Dictionary<Vector2, float> gScore = new Dictionary<Vector2, float> { { start, 0 } };
-        Dictionary<Vector2, float> fScore = new Dictionary<Vector2, float> { { start, Heuristic(start, goal) } };
+        // TODO - We need a grid reference with these
+        // Add unwalkable world grid tiles to the closed set
+        for (int x = 0; x < WorldGrid.instance.gridSize.x; x++)
+        {
+            for (int y = 0; y < WorldGrid.instance.gridSize.y; y++)
+            {
+                if (!WorldGrid.instance.Walkable(new Vector2(x, y)))
+                {
+                    closedSet.Add(new Vector2(x, y));
+                }
+            }
+        }
 
         while (openSet.Count > 0)
         {
             Vector2 current = GetLowestFScore(openSet, fScore);
-            if (current == goal)
-            {
-                return ReconstructPath(cameFrom, current);
-            }
+            if (current == goal) return ReconstructPath(cameFrom, current);
 
             openSet.Remove(current);
             closedSet.Add(current);
 
-            // Add unwalkable world grid tiles to the closed set
-            for (int x = 0; x < WorldGrid.instance.gridSize.x; x++)
-            {
-                for (int y = 0; y < WorldGrid.instance.gridSize.y; y++)
-                {
-                    if (!WorldGrid.instance.Walkable(new Vector2(x, y)))
-                    {
-                        closedSet.Add(new Vector2(x, y));
-                    }
-                }
-            }
-
             foreach (Vector2 neighbor in GetNeighbors(current))
             {
-                if (closedSet.Contains(neighbor))
-                {
-                    continue;
-                }
-
-                if (neighbor.x < 0 || neighbor.x >= WorldGrid.instance.gridSize.x || neighbor.y < 0 || neighbor.y >= WorldGrid.instance.gridSize.y)
-                {
-                    continue;
-                }
+                if (closedSet.Contains(neighbor)) continue;
+                if (OutOfBounds(neighbor)) continue;
 
                 float tentativeGScore = gScore[current] + Vector2.Distance(current, neighbor);
 
@@ -74,15 +58,20 @@ public class AStarPathfinder : MonoBehaviour
             }
         }
 
-        return new List<Vector2>();
+        return new();
     }
 
-    private float Heuristic(Vector2 a, Vector2 b)
+    private static bool OutOfBounds(Vector2 neighbor)
+    {
+        return neighbor.x < 0 || neighbor.x >= WorldGrid.instance.gridSize.x || neighbor.y < 0 || neighbor.y >= WorldGrid.instance.gridSize.y;
+    }
+
+    private static float Heuristic(Vector2 a, Vector2 b)
     {
         return Vector2.Distance(a, b);
     }
 
-    private Vector2 GetLowestFScore(List<Vector2> openSet, Dictionary<Vector2, float> fScore)
+    private static Vector2 GetLowestFScore(List<Vector2> openSet, Dictionary<Vector2, float> fScore)
     {
         Vector2 lowest = openSet[0];
         foreach (Vector2 node in openSet)
@@ -95,7 +84,7 @@ public class AStarPathfinder : MonoBehaviour
         return lowest;
     }
 
-    private List<Vector2> GetNeighbors(Vector2 node)
+    private static List<Vector2> GetNeighbors(Vector2 node)
     {
         List<Vector2> neighbors = new()
         {
@@ -111,15 +100,18 @@ public class AStarPathfinder : MonoBehaviour
         return neighbors;
     }
 
-    private List<Vector2> ReconstructPath(Dictionary<Vector2, Vector2> cameFrom, Vector2 current)
+    private static Stack<Vector2> ReconstructPath(Dictionary<Vector2, Vector2> cameFrom, Vector2 current)
     {
-        List<Vector2> totalPath = new List<Vector2> { current };
+        Stack<Vector2> path = new();
+        path.Push(current);
+
         while (cameFrom.ContainsKey(current))
         {
             current = cameFrom[current];
-            totalPath.Insert(0, current);
+            path.Push(current);
         }
-        return totalPath;
+        return path;
+        //Stack.Last.Value;
     }
 
     private void OnDrawGizmos()
