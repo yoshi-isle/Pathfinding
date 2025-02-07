@@ -132,6 +132,8 @@ public class PlayerController : MonoBehaviour
     {
         if (DrawGizmos)
         {
+            if (currentPath == null) return;
+
             Gizmos.DrawSphere(new(targetTile.x, 0, targetTile.y), 0.2f);
             if (currentPath.Count != 0)
             {

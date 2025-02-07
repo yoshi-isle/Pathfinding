@@ -1,31 +1,47 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldGrid : MonoBehaviour
 {
     public Vector2 gridSize;
     public static WorldGrid instance;
+    public Dictionary<Vector2, TileInfo> Map { get; set; }
 
     void Awake()
     {
         instance = this;
     }
 
-    void OnDrawGizmos()
+    void Start()
     {
+        BakeMap();
+    }
+
+    void BakeMap()
+    {
+        Map = new();
+
         for (int x = 0; x < gridSize.x; x++)
         {
             for (int y = 0; y < gridSize.y; y++)
             {
-                if (Walkable(new(x, y)))
+                var tile = new TileInfo
                 {
-                    Gizmos.color = Color.white;
-                }
-                else
-                {
-                    Gizmos.color = Color.red;
-                }
-                Gizmos.DrawWireSphere(new(x, 0, y), 0.3f);
+                    Walkable = Walkable(new(x, y))
+                };
+
+                Map.Add(new(x, y), tile);
             }
+        }
+    }
+
+    void OnDrawGizmos()
+    {
+        if (Map == null || Map.Count == 0) return;
+        foreach (var item in Map)
+        {
+            Gizmos.color = item.Value.Walkable ? Color.white : Color.red;
+            Gizmos.DrawCube(new(item.Key.x, 0, item.Key.y), Vector3.one * 0.5f);
         }
     }
 
@@ -41,14 +57,16 @@ public class WorldGrid : MonoBehaviour
         );
     }
 
-    public Vector2 WorldLocationToGrid(Vector3 worldLocation)
-    {
-        return new Vector2(Mathf.Round(worldLocation.x), Mathf.Round(worldLocation.z));
-    }
 
     public bool InBoundsAndWalkable(Vector2 worldLocation)
     {
+        if (Map == null || Map.Count == 0 || !Map.ContainsKey(new(worldLocation.x, worldLocation.y))) return false;
+        return Map[new(worldLocation.x, worldLocation.y)].Walkable;
+    }
 
-        return Walkable(worldLocation) && worldLocation.x >= 0 && worldLocation.x <= gridSize.x - 1 && worldLocation.y >= 0 && worldLocation.y <= gridSize.y - 1;
+    // TODO - Move
+    public Vector2 WorldLocationToGrid(Vector3 worldLocation)
+    {
+        return new Vector2(Mathf.Round(worldLocation.x), Mathf.Round(worldLocation.z));
     }
 }

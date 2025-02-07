@@ -15,19 +15,6 @@ public class AStarPathfinder : MonoBehaviour
         Dictionary<Vector2, float> gScore = new() { { start, 0 } };
         Dictionary<Vector2, float> fScore = new() { { start, Heuristic(start, goal) } };
 
-        // TODO - We need a grid reference with these
-        // Add unwalkable world grid tiles to the closed set
-        for (int x = 0; x < WorldGrid.instance.gridSize.x; x++)
-        {
-            for (int y = 0; y < WorldGrid.instance.gridSize.y; y++)
-            {
-                if (!WorldGrid.instance.Walkable(new Vector2(x, y)))
-                {
-                    closedSet.Add(new Vector2(x, y));
-                }
-            }
-        }
-
         while (openSet.Count > 0)
         {
             Vector2 current = GetLowestFScore(openSet, fScore);
@@ -42,7 +29,10 @@ public class AStarPathfinder : MonoBehaviour
                 if (OutOfBounds(neighbor)) continue;
 
                 float tentativeGScore = gScore[current] + Vector2.Distance(current, neighbor);
-
+                if (!WorldGrid.instance.InBoundsAndWalkable(new(neighbor.x, neighbor.y)))
+                {
+                    continue;
+                }
                 if (!openSet.Contains(neighbor))
                 {
                     openSet.Add(neighbor);
@@ -111,7 +101,6 @@ public class AStarPathfinder : MonoBehaviour
             path.Push(current);
         }
         return path;
-        //Stack.Last.Value;
     }
 
     private void OnDrawGizmos()
