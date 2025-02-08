@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     public PlayerState playerState;
     public Vector2 GridLocation => new(transform.position.x, transform.position.z);
 
+    public bool Run;
     public enum PlayerState
     {
         Idle,
@@ -74,7 +75,16 @@ public class PlayerController : MonoBehaviour
 
             if (currentPath != null && currentPath.Count > 1)
             {
-                currentPath.Pop();
+                if (Run)
+                {
+                    currentPath.Pop();
+                    if (currentPath.Count > 1) currentPath.Pop();
+                }
+                else
+                {
+                    currentPath.Pop();
+                }
+
                 transform.position = new Vector3(currentPath.Peek().x, transform.position.y, currentPath.Peek().y);
             }
         }
