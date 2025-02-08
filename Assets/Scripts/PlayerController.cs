@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public Stack<Vector2> currentPath;
     public PlayerState playerState;
     public Vector2 GridLocation => new(transform.position.x, transform.position.z);
+    public Material clickIndicatorMaterial;
 
     public bool Run;
     public enum PlayerState
@@ -130,6 +131,14 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
             {
                 Vector2 gridLocation = WorldGrid.instance.WorldLocationToGrid(hit.point);
+
+                // TODO - template click indicator
+                GameObject clickIndicator = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                clickIndicator.transform.position = new Vector3(gridLocation.x, 0.2f, gridLocation.y);
+                clickIndicator.transform.localScale = new Vector3(0.4f, 6f, 0.4f);
+                clickIndicator.GetComponent<Renderer>().material = clickIndicatorMaterial;
+                Destroy(clickIndicator, 0.1f);
+
                 if (WorldGrid.instance.InBoundsAndWalkable(gridLocation))
                 {
                     request = new WorldClickRequest(gridLocation.x, gridLocation.y);
