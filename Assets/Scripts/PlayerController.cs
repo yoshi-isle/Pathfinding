@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -14,6 +11,7 @@ public class PlayerController : MonoBehaviour
     public PlayerState playerState;
     public Vector2 GridLocation => new(transform.position.x, transform.position.z);
     public Material clickIndicatorMaterial;
+    public Interactable hoveredInteractable;
 
     public bool Run;
     public enum PlayerState
@@ -26,7 +24,11 @@ public class PlayerController : MonoBehaviour
     {
         playerState = PlayerState.Idle;
         targetTile = WorldGrid.instance.WorldLocationToGrid(transform.position);
+
+        // Game event subscriptions
         GameManager.Instance.OnTick += OnTick;
+        Interactable.InteractableMouseHover += InteractableMouseHover;
+        Interactable.InteractableMouseExit += InteractableMouseExit;
     }
 
     void Update()
@@ -39,24 +41,6 @@ public class PlayerController : MonoBehaviour
                 break;
             case PlayerState.Walking:
                 ListenForWorldClicks();
-                break;
-            default:
-                break;
-        }
-    }
-
-    void OnTick()
-    {
-        // Process any state change requests
-        ProcessPreTickStateChangeRequest();
-
-        // Process actions on the tick
-        switch (playerState)
-        {
-            case PlayerState.Idle:
-                break;
-            case PlayerState.Walking:
-                HandleWalk();
                 break;
             default:
                 break;
@@ -76,14 +60,43 @@ public class PlayerController : MonoBehaviour
 
             if (currentPath != null && currentPath.Count > 1)
             {
+                currentPath.Pop();
+
                 if (Run)
                 {
-                    currentPath.Pop();
-                    if (currentPath.Count > 1) currentPath.Pop();
-                }
-                else
-                {
-                    currentPath.Pop();
+                    /*
+                    Analyze the "travel" vector
+                    Determine if valid run action (dictonary)
+                    Travel vector -> maps to -> fail points
+                    */
+                    //TODO - Move this
+                    Vector2 nextTravelVector = currentPath.Count > 1 ? currentPath.ElementAt(1) - WorldGrid.instance.WorldLocationToGrid(transform.position) : Vector2.zero;
+                    Dictionary<Vector2, Vector2> travelMap = new() {
+                        { new Vector2(-2, 2), new Vector2(-1, 1) },
+                        { new Vector2(-2, 1), new Vector2(-1, 1) },
+                        { new Vector2(-2, 0), new Vector2(-1, 0) },
+                        { new Vector2(-2, -1), new Vector2(-1, -1) },
+                        { new Vector2(-2, -2), new Vector2(-1, -1) },
+                        { new Vector2(-1, 2), new Vector2(-1, 1) },
+                        { new Vector2(0, 2), new Vector2(0, 1) },
+                        { new Vector2(1, 2), new Vector2(1, 1) },
+                        { new Vector2(2, 2), new Vector2(1, 1) },
+                        { new Vector2(2, 1), new Vector2(1, 1) },
+                        { new Vector2(2, 0), new Vector2(1, 0) },
+                        { new Vector2(2, -1), new Vector2(1, -1) },
+                        { new Vector2(2, -2), new Vector2(1, -1) },
+                        { new Vector2(1, -2), new Vector2(1, -1) },
+                        { new Vector2(0, -2), new Vector2(0, -1) },
+                        { new Vector2(-1, -2), new Vector2(-1, -1) }
+                    };
+
+                    if (travelMap.ContainsKey(nextTravelVector))
+                    {
+                        if (WorldGrid.instance.InBoundsAndWalkable(currentPath.ElementAt(1) - travelMap[nextTravelVector]))
+                        {
+                            currentPath.Pop();
+                        }
+                    }
                 }
 
                 transform.position = new Vector3(currentPath.Peek().x, transform.position.y, currentPath.Peek().y);
@@ -145,6 +158,34 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void OnTick()
+    {
+        // Process any state change requests
+        ProcessPreTickStateChangeRequest();
+
+        // Process actions on the tick
+        switch (playerState)
+        {
+            case PlayerState.Idle:
+                break;
+            case PlayerState.Walking:
+                HandleWalk();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void InteractableMouseExit(Interactable interactable)
+    {
+        hoveredInteractable = null;
+    }
+
+    private void InteractableMouseHover(Interactable interactable)
+    {
+        hoveredInteractable = interactable;
     }
 
     void OnDrawGizmos()

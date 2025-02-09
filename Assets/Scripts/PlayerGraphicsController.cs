@@ -11,6 +11,7 @@ public class PlayerGraphicsController : MonoBehaviour
     {
         float movementSpeed = velocity.magnitude / Time.deltaTime;
         animator.SetFloat("MovementSpeed", movementSpeed);
+        animator.SetBool("Run", FindAnyObjectByType<PlayerController>().Run);
         transform.position = Vector3.SmoothDamp(transform.position, follow.transform.position, ref velocity, smoothTime);
 
         // If the vector difference is still a "considerable" distance still rotate

@@ -18,9 +18,8 @@ public class DebugInfo : MonoBehaviour
         string request_string = "None";
         if (pc.request != null)
         {
-            if (pc.request is WorldClickRequest)
+            if (pc.request is WorldClickRequest wcr)
             {
-                var wcr = (WorldClickRequest)pc.request;
                 request_string = $"WORLD CLICK ({wcr.X}, {wcr.Y})";
             }
         }
@@ -32,6 +31,7 @@ public class DebugInfo : MonoBehaviour
         Tick Request: {request_string}
         Path Length: {(pc.currentPath != null && pc.currentPath.Count > 0 ? pc.currentPath.Count : "N/A")}
         Target Tile: {pc.targetTile}
+        Hovered Interactable: {pc.hoveredInteractable}
         ";
 
     }

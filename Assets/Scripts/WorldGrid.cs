@@ -61,6 +61,7 @@ public class WorldGrid : MonoBehaviour
     public bool InBoundsAndWalkable(Vector2 worldLocation)
     {
         if (Map == null || Map.Count == 0 || !Map.ContainsKey(new(worldLocation.x, worldLocation.y))) return false;
+        var hi = Map[new(worldLocation.x, worldLocation.y)].Walkable;
         return Map[new(worldLocation.x, worldLocation.y)].Walkable;
     }
 
