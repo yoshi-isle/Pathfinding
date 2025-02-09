@@ -15,6 +15,11 @@ public class Interactable : MonoBehaviour
 
     }
 
+    public virtual void Interact()
+    {
+        print($"Interacting with {InteractName} ({InteractDescription})");
+    }
+
     void OnMouseOver()
     {
         InteractableMouseHover?.Invoke(this);
