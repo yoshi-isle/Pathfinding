@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public Vector2 GridLocation => new(transform.position.x, transform.position.z);
     public Material clickIndicatorMaterial;
     public Interactable hoveredInteractable;
+    public Interactable targetInteractable;
     public static event Action<Vector3> WorldClick;
 
     public bool Run;
@@ -145,13 +146,26 @@ public class PlayerController : MonoBehaviour
         {
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
             {
-                WorldClick?.Invoke(Input.mousePosition);
-                Vector2 gridLocation = WorldGrid.instance.WorldLocationToGrid(hit.point);
-
-                if (WorldGrid.instance.InBoundsAndWalkable(gridLocation))
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Walkable"))
                 {
-                    request = new WorldClickRequest(gridLocation.x, gridLocation.y);
+                    WorldClick?.Invoke(Input.mousePosition);
+                    Vector2 gridLocation = WorldGrid.instance.WorldLocationToGrid(hit.point);
+
+                    if (WorldGrid.instance.InBoundsAndWalkable(gridLocation))
+                    {
+                        request = new WorldClickRequest(gridLocation.x, gridLocation.y);
+                    }
                 }
+                else if (hoveredInteractable != null)
+                {
+                    hoveredInteractable.OnClick();
+                    targetInteractable = hoveredInteractable;
+                }
+
+            }
+            else
+            {
+                print("Something else");
             }
         }
     }

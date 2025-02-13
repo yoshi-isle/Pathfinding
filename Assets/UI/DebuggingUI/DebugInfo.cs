@@ -32,6 +32,7 @@ public class DebugInfo : MonoBehaviour
         Path Length: {(pc.currentPath != null && pc.currentPath.Count > 0 ? pc.currentPath.Count : "N/A")}
         Target Tile: {pc.targetTile}
         Hovered Interactable: {pc.hoveredInteractable}
+        Target Interactable: {pc.targetInteractable}
         ";
 
     }
