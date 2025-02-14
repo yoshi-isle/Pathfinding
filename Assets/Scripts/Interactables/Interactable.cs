@@ -37,6 +37,16 @@ public class Interactable : MonoBehaviour
         InteractableMouseExit?.Invoke(this);
     }
 
+    public List<Vector2> GetGridInteractionLocations()
+    {
+        var worldInteractionLocations = new List<Vector2>();
+        foreach (var location in InteractLocationsRelative)
+        {
+            worldInteractionLocations.Add(new(location.x + transform.position.x, location.y + transform.position.z));
+        }
+        return worldInteractionLocations;
+    }
+
     public List<Vector3> GetWorldInteractionLocations()
     {
         var worldInteractionLocations = new List<Vector3>();

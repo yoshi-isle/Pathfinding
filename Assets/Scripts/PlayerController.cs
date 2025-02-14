@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -20,7 +21,8 @@ public class PlayerController : MonoBehaviour
     public enum PlayerState
     {
         Idle,
-        Walking
+        Walking,
+        WalkingTowardsInteractable
     }
 
     void Start()
@@ -44,6 +46,30 @@ public class PlayerController : MonoBehaviour
                 break;
             case PlayerState.Walking:
                 ListenForWorldClicks();
+                break;
+            case PlayerState.WalkingTowardsInteractable:
+                ListenForWorldClicks();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void OnTick()
+    {
+        // Process any state change requests
+        ProcessPreTickStateChangeRequest();
+
+        // Process actions on the tick
+        switch (playerState)
+        {
+            case PlayerState.Idle:
+                break;
+            case PlayerState.Walking:
+                HandleWalk();
+                break;
+            case PlayerState.WalkingTowardsInteractable:
+                HandleWalk();
                 break;
             default:
                 break;
@@ -118,12 +144,30 @@ public class PlayerController : MonoBehaviour
 
         switch (playerState)
         {
+            // TODO - Repeated code
             case PlayerState.Idle:
                 if (request is WorldClickRequest worldClickRequest)
                 {
                     playerState = PlayerState.Walking;
                     targetTile = new Vector2(Mathf.Round(worldClickRequest.X), Mathf.Round(worldClickRequest.Y));
                     currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
+                }
+                else if (request is InteractableClickRequest interactableClickRequest)
+                {
+                    // TODO - Path to each. May not be efficient
+                    var pathsToInteractable = new List<Stack<Vector2>>();
+                    foreach (var possibleLocation in interactableClickRequest.clickedInteractable.GetGridInteractionLocations())
+                    {
+                        var test = AStarPathfinder.FindPath(GridLocation, possibleLocation);
+                        pathsToInteractable.Add(AStarPathfinder.FindPath(GridLocation, possibleLocation));
+                    }
+                    var shortestPath = pathsToInteractable.OrderBy(path => path.Count).FirstOrDefault();
+                    if (shortestPath != null)
+                    {
+                        currentPath = shortestPath;
+                        targetTile = currentPath.Last();
+                        playerState = PlayerState.WalkingTowardsInteractable;
+                    }
                 }
                 request = null;
                 break;
@@ -132,6 +176,48 @@ public class PlayerController : MonoBehaviour
                 {
                     targetTile = new Vector2(Mathf.Round(worldClickRequest2.X), Mathf.Round(worldClickRequest2.Y));
                     currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
+                }
+                else if (request is InteractableClickRequest interactableClickRequest2)
+                {
+                    // TODO - Path to each. May not be efficient
+                    var pathsToInteractable = new List<Stack<Vector2>>();
+                    foreach (var possibleLocation in interactableClickRequest2.clickedInteractable.GetGridInteractionLocations())
+                    {
+                        var test = AStarPathfinder.FindPath(GridLocation, possibleLocation);
+                        pathsToInteractable.Add(AStarPathfinder.FindPath(GridLocation, possibleLocation));
+                    }
+                    var shortestPath = pathsToInteractable.OrderBy(path => path.Count).FirstOrDefault();
+                    if (shortestPath != null)
+                    {
+                        currentPath = shortestPath;
+                        targetTile = currentPath.Last();
+                        playerState = PlayerState.WalkingTowardsInteractable;
+                    }
+                }
+                request = null;
+                break;
+            case PlayerState.WalkingTowardsInteractable:
+                if (request is WorldClickRequest worldClickRequest3)
+                {
+                    targetTile = new Vector2(Mathf.Round(worldClickRequest3.X), Mathf.Round(worldClickRequest3.Y));
+                    currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
+                }
+                else if (request is InteractableClickRequest interactableClickRequest3)
+                {
+                    // TODO - Path to each. May not be efficient
+                    var pathsToInteractable = new List<Stack<Vector2>>();
+                    foreach (var possibleLocation in interactableClickRequest3.clickedInteractable.GetGridInteractionLocations())
+                    {
+                        var test = AStarPathfinder.FindPath(GridLocation, possibleLocation);
+                        pathsToInteractable.Add(AStarPathfinder.FindPath(GridLocation, possibleLocation));
+                    }
+                    var shortestPath = pathsToInteractable.OrderBy(path => path.Count).FirstOrDefault();
+                    if (shortestPath != null)
+                    {
+                        currentPath = shortestPath;
+                        targetTile = currentPath.Last();
+                        playerState = PlayerState.WalkingTowardsInteractable;
+                    }
                 }
                 request = null;
                 break;
@@ -159,6 +245,7 @@ public class PlayerController : MonoBehaviour
                 else if (hoveredInteractable != null)
                 {
                     hoveredInteractable.OnClick();
+                    request = new InteractableClickRequest(hoveredInteractable);
                     targetInteractable = hoveredInteractable;
                 }
 
@@ -167,24 +254,6 @@ public class PlayerController : MonoBehaviour
             {
                 print("Something else");
             }
-        }
-    }
-
-    private void OnTick()
-    {
-        // Process any state change requests
-        ProcessPreTickStateChangeRequest();
-
-        // Process actions on the tick
-        switch (playerState)
-        {
-            case PlayerState.Idle:
-                break;
-            case PlayerState.Walking:
-                HandleWalk();
-                break;
-            default:
-                break;
         }
     }
 
