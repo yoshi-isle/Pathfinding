@@ -70,4 +70,23 @@ public class WorldGrid : MonoBehaviour
     {
         return new Vector2(Mathf.Round(worldLocation.x), Mathf.Round(worldLocation.z));
     }
+
+    public Dictionary<Vector2, Vector2> GetRunCollisionTravelRules => new() {
+        { new Vector2(-2, 2), new Vector2(-1, 1) },
+        { new Vector2(-2, 1), new Vector2(-1, 1) },
+        { new Vector2(-2, 0), new Vector2(-1, 0) },
+        { new Vector2(-2, -1), new Vector2(-1, -1) },
+        { new Vector2(-2, -2), new Vector2(-1, -1) },
+        { new Vector2(-1, 2), new Vector2(-1, 1) },
+        { new Vector2(0, 2), new Vector2(0, 1) },
+        { new Vector2(1, 2), new Vector2(1, 1) },
+        { new Vector2(2, 2), new Vector2(1, 1) },
+        { new Vector2(2, 1), new Vector2(1, 1) },
+        { new Vector2(2, 0), new Vector2(1, 0) },
+        { new Vector2(2, -1), new Vector2(1, -1) },
+        { new Vector2(2, -2), new Vector2(1, -1) },
+        { new Vector2(1, -2), new Vector2(1, -1) },
+        { new Vector2(0, -2), new Vector2(0, -1) },
+        { new Vector2(-1, -2), new Vector2(-1, -1) }
+    };
 }

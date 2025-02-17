@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -10,24 +9,21 @@ public class PlayerController : MonoBehaviour
     public Request request;
     public Vector2 targetTile;
     public Stack<Vector2> currentPath;
-    public PlayerState playerState;
     public Vector2 GridLocation => new(transform.position.x, transform.position.z);
-    public Material clickIndicatorMaterial;
     public Interactable hoveredInteractable;
     public Interactable targetInteractable;
     public static event Action<Vector3> WorldClick;
 
+    public PlayerState playerState;
     public bool Run;
     public enum PlayerState
     {
-        Idle,
-        Walking,
-        WalkingTowardsInteractable
+        Normal,
+        Cutscene
     }
 
     void Start()
     {
-        playerState = PlayerState.Idle;
         targetTile = WorldGrid.instance.WorldLocationToGrid(transform.position);
 
         // Game event subscriptions
@@ -37,196 +33,6 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update()
-    {
-        // Listen for inputs
-        switch (playerState)
-        {
-            case PlayerState.Idle:
-                ListenForWorldClicks();
-                break;
-            case PlayerState.Walking:
-                ListenForWorldClicks();
-                break;
-            case PlayerState.WalkingTowardsInteractable:
-                ListenForWorldClicks();
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void OnTick()
-    {
-        // Process any state change requests
-        ProcessPreTickStateChangeRequest();
-
-        // Process actions on the tick
-        switch (playerState)
-        {
-            case PlayerState.Idle:
-                break;
-            case PlayerState.Walking:
-                HandleWalk();
-                break;
-            case PlayerState.WalkingTowardsInteractable:
-                HandleWalk();
-                break;
-            default:
-                break;
-        }
-    }
-
-    void HandleWalk()
-    {
-        // Move along path if we're not at the target
-        if (GridLocation != targetTile)
-        {
-            // Impossible path
-            if (currentPath.Count == 0)
-            {
-                targetTile = WorldGrid.instance.WorldLocationToGrid(transform.position);
-            }
-
-            if (currentPath != null && currentPath.Count > 1)
-            {
-                currentPath.Pop();
-
-                if (Run)
-                {
-                    /*
-                    Analyze the "travel" vector
-                    Determine if valid run action (dictonary)
-                    Travel vector -> maps to -> fail points
-                    */
-                    //TODO - Move this
-                    Vector2 nextTravelVector = currentPath.Count > 1 ? currentPath.ElementAt(1) - WorldGrid.instance.WorldLocationToGrid(transform.position) : Vector2.zero;
-                    Dictionary<Vector2, Vector2> travelMap = new() {
-                        { new Vector2(-2, 2), new Vector2(-1, 1) },
-                        { new Vector2(-2, 1), new Vector2(-1, 1) },
-                        { new Vector2(-2, 0), new Vector2(-1, 0) },
-                        { new Vector2(-2, -1), new Vector2(-1, -1) },
-                        { new Vector2(-2, -2), new Vector2(-1, -1) },
-                        { new Vector2(-1, 2), new Vector2(-1, 1) },
-                        { new Vector2(0, 2), new Vector2(0, 1) },
-                        { new Vector2(1, 2), new Vector2(1, 1) },
-                        { new Vector2(2, 2), new Vector2(1, 1) },
-                        { new Vector2(2, 1), new Vector2(1, 1) },
-                        { new Vector2(2, 0), new Vector2(1, 0) },
-                        { new Vector2(2, -1), new Vector2(1, -1) },
-                        { new Vector2(2, -2), new Vector2(1, -1) },
-                        { new Vector2(1, -2), new Vector2(1, -1) },
-                        { new Vector2(0, -2), new Vector2(0, -1) },
-                        { new Vector2(-1, -2), new Vector2(-1, -1) }
-                    };
-
-                    if (travelMap.ContainsKey(nextTravelVector))
-                    {
-                        if (WorldGrid.instance.InBoundsAndWalkable(currentPath.ElementAt(1) - travelMap[nextTravelVector]))
-                        {
-                            currentPath.Pop();
-                        }
-                    }
-                }
-
-                transform.position = new Vector3(currentPath.Peek().x, transform.position.y, currentPath.Peek().y);
-            }
-        }
-        else
-        {
-            playerState = PlayerState.Idle;
-            currentPath.Clear();
-        }
-    }
-
-    private void ProcessPreTickStateChangeRequest()
-    {
-        if (request == null) return;
-
-        switch (playerState)
-        {
-            // TODO - Repeated code
-            case PlayerState.Idle:
-                if (request is WorldClickRequest worldClickRequest)
-                {
-                    playerState = PlayerState.Walking;
-                    targetTile = new Vector2(Mathf.Round(worldClickRequest.X), Mathf.Round(worldClickRequest.Y));
-                    currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
-                }
-                else if (request is InteractableClickRequest interactableClickRequest)
-                {
-                    // TODO - Path to each. May not be efficient
-                    var pathsToInteractable = new List<Stack<Vector2>>();
-                    foreach (var possibleLocation in interactableClickRequest.clickedInteractable.GetGridInteractionLocations())
-                    {
-                        var test = AStarPathfinder.FindPath(GridLocation, possibleLocation);
-                        pathsToInteractable.Add(AStarPathfinder.FindPath(GridLocation, possibleLocation));
-                    }
-                    var shortestPath = pathsToInteractable.OrderBy(path => path.Count).FirstOrDefault();
-                    if (shortestPath != null)
-                    {
-                        currentPath = shortestPath;
-                        targetTile = currentPath.Last();
-                        playerState = PlayerState.WalkingTowardsInteractable;
-                    }
-                }
-                request = null;
-                break;
-            case PlayerState.Walking:
-                if (request is WorldClickRequest worldClickRequest2)
-                {
-                    targetTile = new Vector2(Mathf.Round(worldClickRequest2.X), Mathf.Round(worldClickRequest2.Y));
-                    currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
-                }
-                else if (request is InteractableClickRequest interactableClickRequest2)
-                {
-                    // TODO - Path to each. May not be efficient
-                    var pathsToInteractable = new List<Stack<Vector2>>();
-                    foreach (var possibleLocation in interactableClickRequest2.clickedInteractable.GetGridInteractionLocations())
-                    {
-                        var test = AStarPathfinder.FindPath(GridLocation, possibleLocation);
-                        pathsToInteractable.Add(AStarPathfinder.FindPath(GridLocation, possibleLocation));
-                    }
-                    var shortestPath = pathsToInteractable.OrderBy(path => path.Count).FirstOrDefault();
-                    if (shortestPath != null)
-                    {
-                        currentPath = shortestPath;
-                        targetTile = currentPath.Last();
-                        playerState = PlayerState.WalkingTowardsInteractable;
-                    }
-                }
-                request = null;
-                break;
-            case PlayerState.WalkingTowardsInteractable:
-                if (request is WorldClickRequest worldClickRequest3)
-                {
-                    targetTile = new Vector2(Mathf.Round(worldClickRequest3.X), Mathf.Round(worldClickRequest3.Y));
-                    currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
-                }
-                else if (request is InteractableClickRequest interactableClickRequest3)
-                {
-                    // TODO - Path to each. May not be efficient
-                    var pathsToInteractable = new List<Stack<Vector2>>();
-                    foreach (var possibleLocation in interactableClickRequest3.clickedInteractable.GetGridInteractionLocations())
-                    {
-                        var test = AStarPathfinder.FindPath(GridLocation, possibleLocation);
-                        pathsToInteractable.Add(AStarPathfinder.FindPath(GridLocation, possibleLocation));
-                    }
-                    var shortestPath = pathsToInteractable.OrderBy(path => path.Count).FirstOrDefault();
-                    if (shortestPath != null)
-                    {
-                        currentPath = shortestPath;
-                        targetTile = currentPath.Last();
-                        playerState = PlayerState.WalkingTowardsInteractable;
-                    }
-                }
-                request = null;
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void ListenForWorldClicks()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -248,13 +54,82 @@ public class PlayerController : MonoBehaviour
                     request = new InteractableClickRequest(hoveredInteractable);
                     targetInteractable = hoveredInteractable;
                 }
-
-            }
-            else
-            {
-                print("Something else");
             }
         }
+    }
+
+    private void OnTick()
+    {
+        // Process any state change requests
+        ProcessEndTickRequest();
+
+        // Move along path if we're not at the target
+        if (GridLocation != targetTile)
+        {
+            // Impossible path
+            if (currentPath.Count == 0)
+            {
+                targetTile = WorldGrid.instance.WorldLocationToGrid(transform.position);
+            }
+
+            if (currentPath != null && currentPath.Count > 1)
+            {
+                currentPath.Pop();
+
+                if (Run)
+                {
+                    Vector2 nextTravelVector = currentPath.Count > 1 ? currentPath.ElementAt(1) - WorldGrid.instance.WorldLocationToGrid(transform.position) : Vector2.zero;
+
+                    if (WorldGrid.instance.GetRunCollisionTravelRules.ContainsKey(nextTravelVector))
+                    {
+                        if (WorldGrid.instance.InBoundsAndWalkable(currentPath.ElementAt(1) - WorldGrid.instance.GetRunCollisionTravelRules[nextTravelVector]))
+                        {
+                            currentPath.Pop();
+                        }
+                    }
+                }
+
+                transform.position = new Vector3(currentPath.Peek().x, transform.position.y, currentPath.Peek().y);
+            }
+        }
+    }
+
+    private void ProcessEndTickRequest()
+    {
+        if (request == null) return;
+
+        switch (playerState)
+        {
+            case PlayerState.Normal:
+                if (request is WorldClickRequest worldClickRequest)
+                {
+                    targetTile = new Vector2(Mathf.Round(worldClickRequest.X), Mathf.Round(worldClickRequest.Y));
+                    currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
+                }
+                else if (request is InteractableClickRequest interactableClickRequest)
+                {
+                    // TODO - Path to each. May not be efficient
+                    var pathsToInteractable = new List<Stack<Vector2>>();
+                    foreach (var possibleLocation in interactableClickRequest.clickedInteractable.GetGridInteractionLocations())
+                    {
+                        var test = AStarPathfinder.FindPath(GridLocation, possibleLocation);
+                        pathsToInteractable.Add(AStarPathfinder.FindPath(GridLocation, possibleLocation));
+                    }
+                    var shortestPath = pathsToInteractable.OrderBy(path => path.Count).FirstOrDefault();
+                    if (shortestPath != null)
+                    {
+                        currentPath = shortestPath;
+                        targetTile = currentPath.Last();
+                    }
+                }
+                break;
+            case PlayerState.Cutscene:
+                print("Player is in a cutscene, so the request is ignored.");
+                break;
+            default:
+                break;
+        }
+        request = null;
     }
 
     private void InteractableMouseExit(Interactable interactable)
