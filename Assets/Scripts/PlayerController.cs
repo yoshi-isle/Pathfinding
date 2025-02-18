@@ -50,7 +50,6 @@ public class PlayerController : MonoBehaviour
                 {
                     hoveredInteractable.OnClick();
                     request = new InteractableClickRequest(hoveredInteractable);
-                    targetInteractable = hoveredInteractable;
                 }
             }
         }
@@ -59,7 +58,7 @@ public class PlayerController : MonoBehaviour
     private void OnTick()
     {
         // Process requests
-        ProcessEndTickRequest();
+        ProcessPreTickRequest();
 
         // Check if at interactable
         if (targetInteractable != null)
@@ -109,10 +108,9 @@ public class PlayerController : MonoBehaviour
                 transform.position = new Vector3(currentPath.Peek().x, transform.position.y, currentPath.Peek().y);
             }
         }
-
     }
 
-    private void ProcessEndTickRequest()
+    private void ProcessPreTickRequest()
     {
         if (request == null) return;
 
@@ -122,6 +120,7 @@ public class PlayerController : MonoBehaviour
                 if (request is WorldClickRequest worldClickRequest)
                 {
                     targetTile = new Vector2(Mathf.Round(worldClickRequest.X), Mathf.Round(worldClickRequest.Y));
+                    targetInteractable = null;
                     currentPath = AStarPathfinder.FindPath(GridLocation, (Vector2)targetTile);
                 }
                 else if (request is InteractableClickRequest interactableClickRequest)
@@ -140,6 +139,7 @@ public class PlayerController : MonoBehaviour
                     if (shortestPath != null)
                     {
                         currentPath = shortestPath;
+                        targetInteractable = interactableClickRequest.clickedInteractable;
                         targetTile = currentPath.Last();
                     }
                 }
