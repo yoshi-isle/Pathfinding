@@ -22,6 +22,10 @@ public class DebugInfo : MonoBehaviour
             {
                 request_string = $"WORLD CLICK ({wcr.X}, {wcr.Y})";
             }
+            if (pc.request is InteractableClickRequest icr)
+            {
+                request_string = $"INTERACTABLE CLICK ({icr.clickedInteractable.gameObject.name})";
+            }       
         }
 
         Vector2 player_tile = WorldGrid.instance.WorldLocationToGrid(pc.gameObject.transform.position);

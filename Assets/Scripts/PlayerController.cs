@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
         GameManager.Instance.OnTick += OnTick;
         Interactable.InteractableMouseHover += InteractableMouseHover;
         Interactable.InteractableMouseExit += InteractableMouseExit;
+        DontDestroyOnLoad(this.gameObject);
     }
 
     void Update()

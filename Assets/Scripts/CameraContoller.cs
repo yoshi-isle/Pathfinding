@@ -23,6 +23,10 @@ public class CameraController : MonoBehaviour
     public float minVerticalOffset = -5f;
     public float lookUpAmount = 1f;
 
+    void Start()
+    {
+        DontDestroyOnLoad(this.gameObject);
+    }
     void Update()
     {
         rotateInputX -= Input.GetAxis("Horizontal") * rotateSpeed * Time.deltaTime;
