@@ -224,7 +224,7 @@ Transform:
   m_GameObject: {fileID: 49961813}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 11, y: -0.63, z: 12}
+  m_LocalPosition: {x: 21, y: -0.63, z: 23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -250,7 +250,7 @@ MonoBehaviour:
   InteractName: Ladder
   InteractDescription: Climb
   ToScene:
-    sceneAsset: {fileID: 102900000, guid: 9da6b67923e3f5c4fa5e58fb50ea7177, type: 3}
+    sceneAsset: {fileID: 0}
 --- !u!1 &52915926
 GameObject:
   m_ObjectHideFlags: 0
@@ -1097,15 +1097,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 45808614f59b0af4c8102dccf1c00d60, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 14
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45808614f59b0af4c8102dccf1c00d60, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.00000073511734
+      value: 0.00000042913754
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45808614f59b0af4c8102dccf1c00d60, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 22
+      value: 29
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45808614f59b0af4c8102dccf1c00d60, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2148,7 +2148,7 @@ Transform:
   m_GameObject: {fileID: 1794155976}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 19, y: -0.54, z: 21}
+  m_LocalPosition: {x: 5, y: -0.54, z: 8}
   m_LocalScale: {x: 3, y: 4.3821, z: 11}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2281,7 +2281,7 @@ Transform:
   m_GameObject: {fileID: 1822707688}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 17, y: -0.63, z: 16}
+  m_LocalPosition: {x: 13, y: -0.63, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

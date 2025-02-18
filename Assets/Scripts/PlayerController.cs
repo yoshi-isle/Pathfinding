@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public bool DrawGizmos;
     public Request request;
-    public Vector2 targetTile;
+    public Vector2? targetTile = null;
     public Stack<Vector2> currentPath;
     public Vector2 GridLocation => new(transform.position.x, transform.position.z);
     public Interactable hoveredInteractable;
@@ -24,8 +24,6 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        targetTile = WorldGrid.instance.WorldLocationToGrid(transform.position);
-
         // Game event subscriptions
         GameManager.Instance.OnTick += OnTick;
         Interactable.InteractableMouseHover += InteractableMouseHover;
@@ -60,11 +58,30 @@ public class PlayerController : MonoBehaviour
 
     private void OnTick()
     {
-        // Process any state change requests
+        // Process requests
         ProcessEndTickRequest();
 
+        // Check if at interactable
+        if (targetInteractable != null)
+        {
+            foreach (var location in targetInteractable.GetGridInteractionLocations())
+            {
+                if (GridLocation == location)
+                {
+                    print($"Reached an interact location for {targetInteractable.gameObject.name}");
+                    targetInteractable.Interact();
+                    targetInteractable = null;
+                }
+            }
+        }
+
+        if (GridLocation == targetTile)
+        {
+            targetTile = null;
+        }
+
         // Move along path if we're not at the target
-        if (GridLocation != targetTile)
+        if (targetTile != null)
         {
             // Impossible path
             if (currentPath.Count == 0)
@@ -92,6 +109,7 @@ public class PlayerController : MonoBehaviour
                 transform.position = new Vector3(currentPath.Peek().x, transform.position.y, currentPath.Peek().y);
             }
         }
+
     }
 
     private void ProcessEndTickRequest()
@@ -104,7 +122,7 @@ public class PlayerController : MonoBehaviour
                 if (request is WorldClickRequest worldClickRequest)
                 {
                     targetTile = new Vector2(Mathf.Round(worldClickRequest.X), Mathf.Round(worldClickRequest.Y));
-                    currentPath = AStarPathfinder.FindPath(GridLocation, targetTile);
+                    currentPath = AStarPathfinder.FindPath(GridLocation, (Vector2)targetTile);
                 }
                 else if (request is InteractableClickRequest interactableClickRequest)
                 {
@@ -112,8 +130,11 @@ public class PlayerController : MonoBehaviour
                     var pathsToInteractable = new List<Stack<Vector2>>();
                     foreach (var possibleLocation in interactableClickRequest.clickedInteractable.GetGridInteractionLocations())
                     {
-                        var test = AStarPathfinder.FindPath(GridLocation, possibleLocation);
-                        pathsToInteractable.Add(AStarPathfinder.FindPath(GridLocation, possibleLocation));
+                        var path = AStarPathfinder.FindPath(GridLocation, possibleLocation);
+                        if (path.Count() != 0)
+                        {
+                            pathsToInteractable.Add(path);
+                        }
                     }
                     var shortestPath = pathsToInteractable.OrderBy(path => path.Count).FirstOrDefault();
                     if (shortestPath != null)
@@ -144,11 +165,16 @@ public class PlayerController : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if (targetTile == null)
+        {
+            return;
+        }
         if (DrawGizmos)
         {
+            Vector2 target = (Vector2)targetTile;
             if (currentPath == null) return;
 
-            Gizmos.DrawSphere(new(targetTile.x, 0, targetTile.y), 0.2f);
+            Gizmos.DrawSphere(new(target.x, 0, target.y), 0.2f);
             if (currentPath.Count != 0)
             {
                 Gizmos.color = Color.magenta;
