@@ -1,40 +1,81 @@
 using System;
-using System.Collections;
+using System.IO;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public static class GameManager
 {
-    public delegate void TickEventHandler();
-    public static GameManager Instance { get; private set; }
-    public event Action OnTick;
+    private static readonly string saveFilePath = Path.Combine(Application.persistentDataPath, "PlayerData.json");
 
-    void Awake()
+    [Serializable]
+    public class PlayerData
     {
-        if (Instance != null && Instance != this)
+        public int NumberOfRoomsExplored;
+        public PlayerData()
         {
-            Debug.LogError($"Multiple GameManager instances detected. Destroying duplicate on {gameObject.name}");
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-        StartCoroutine(TickEvent());
-    }
-
-    IEnumerator TickEvent()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(0.42f);
-            OnTick?.Invoke();
+            NumberOfRoomsExplored = 0;
         }
     }
 
-    void OnDestroy()
+    private static PlayerData currentPlayerData = new PlayerData();
+
+    public static void SaveGame()
     {
-        if (Instance == this)
+        try
         {
-            Instance = null;
+            string saveData = JsonUtility.ToJson(currentPlayerData);
+            File.WriteAllText(saveFilePath, saveData);
         }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to save game: {e.Message}");
+        }
+    }
+
+    public static void LoadGame()
+    {
+        try
+        {
+            if (File.Exists(saveFilePath))
+            {
+                string loadedData = File.ReadAllText(saveFilePath);
+                currentPlayerData = JsonUtility.FromJson<PlayerData>(loadedData);
+            }
+            else
+            {
+                currentPlayerData = new PlayerData();
+                SaveGame();
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to load game: {e.Message}");
+            currentPlayerData = new PlayerData();
+        }
+    }
+
+    public static void DeleteSaveFile()
+    {
+        try
+        {
+            if (File.Exists(saveFilePath))
+            {
+                File.Delete(saveFilePath);
+                currentPlayerData = new PlayerData();
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to delete save file: {e.Message}");
+        }
+    }
+
+    public static void IncrementRoomsExplored()
+    {
+        currentPlayerData.NumberOfRoomsExplored++;
+    }
+
+    public static int GetRoomsExplored()
+    {
+        return currentPlayerData.NumberOfRoomsExplored;
     }
 }

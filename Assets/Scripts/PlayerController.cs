@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         // Game event subscriptions
-        GameManager.Instance.OnTick += OnTick;
+        TickCounter.Instance.OnTick += OnTick;
         Interactable.InteractableMouseHover += InteractableMouseHover;
         Interactable.InteractableMouseExit += InteractableMouseExit;
         DontDestroyOnLoad(this.gameObject);
