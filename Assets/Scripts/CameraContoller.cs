@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraController : MonoBehaviour
 {
@@ -26,7 +28,14 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(this.gameObject);
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
+
+    private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+    {
+        transform.position = target.position - (offset * currentZoom) + Vector3.up * verticalOffset;
+    }
+
     void Update()
     {
         rotateInputX -= Input.GetAxis("Horizontal") * rotateSpeed * Time.deltaTime;
