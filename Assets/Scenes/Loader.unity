@@ -165,6 +165,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ToScene:
     sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+  playerPrefab: {fileID: 6174051511377438990, guid: d0e09da64298e4bec8ecabbc94181556, type: 3}
+  playerGraphicsPrefab: {fileID: 7359200211903642661, guid: 3477e4b2f371247a2bfe591531cd6f07, type: 3}
+  cameraPrefab: {fileID: 3556363053602026084, guid: 7e2ab212a76be41dd8ce9519144b392e, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -7,11 +7,6 @@ public class PlayerGraphicsController : MonoBehaviour
     public float smoothTime = 0.2f;
     public Animator animator;
 
-    void Start()
-    {
-        DontDestroyOnLoad(this.gameObject);
-    }
-
     void Update()
     {
         float movementSpeed = velocity.magnitude / Time.deltaTime;

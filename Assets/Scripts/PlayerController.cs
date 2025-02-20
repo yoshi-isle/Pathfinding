@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     public Interactable hoveredInteractable;
     public Interactable targetInteractable;
     public static event Action<Vector3> WorldClick;
-
+    public Camera Camera;
     public PlayerState playerState;
     public bool Run;
     public enum PlayerState
@@ -28,14 +28,13 @@ public class PlayerController : MonoBehaviour
         TickCounter.Instance.OnTick += OnTick;
         Interactable.InteractableMouseHover += InteractableMouseHover;
         Interactable.InteractableMouseExit += InteractableMouseExit;
-        DontDestroyOnLoad(this.gameObject);
     }
 
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
+            if (Physics.Raycast(Camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
             {
                 if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Walkable"))
                 {
@@ -58,6 +57,10 @@ public class PlayerController : MonoBehaviour
 
     private void OnTick()
     {
+        // TODO
+        GameManager.SavePlayerPosition(GridLocation);
+        GameManager.SaveGame();
+
         // Process requests
         ProcessPreTickRequest();
 

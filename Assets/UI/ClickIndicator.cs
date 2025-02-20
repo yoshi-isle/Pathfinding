@@ -8,7 +8,6 @@ public class ClickIndicator : MonoBehaviour
     void Start()
     {
         PlayerController.WorldClick += OnWorldClick;
-        DontDestroyOnLoad(this.gameObject);
     }
 
     private void OnWorldClick(Vector3 mousePosition)

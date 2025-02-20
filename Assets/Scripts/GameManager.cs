@@ -4,19 +4,21 @@ using UnityEngine;
 
 public static class GameManager
 {
-    private static readonly string saveFilePath = Path.Combine(Application.persistentDataPath, "PlayerData.json");
+    private static readonly string saveFilePath = Path.Combine(Application.dataPath, "Scripts", "PlayerData.json");
 
     [Serializable]
     public class PlayerData
     {
         public int NumberOfRoomsExplored;
+        public Vector2 GridLocation;
         public PlayerData()
         {
             NumberOfRoomsExplored = 0;
+            GridLocation = Vector2.zero;
         }
     }
 
-    private static PlayerData currentPlayerData = new PlayerData();
+    private static PlayerData currentPlayerData;
 
     public static void SaveGame()
     {
@@ -69,13 +71,23 @@ public static class GameManager
         }
     }
 
+    public static void SavePlayerPosition(Vector2 gridLocation)
+    {
+        currentPlayerData.GridLocation = gridLocation;
+    }
+
     public static void IncrementRoomsExplored()
     {
         currentPlayerData.NumberOfRoomsExplored++;
     }
 
-    public static int GetRoomsExplored()
+    public static int LoadRoomsExplored()
     {
         return currentPlayerData.NumberOfRoomsExplored;
+    }
+
+    public static Vector2 LoadPlayerPosition()
+    {
+        return currentPlayerData.GridLocation;
     }
 }

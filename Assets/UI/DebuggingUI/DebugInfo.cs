@@ -15,6 +15,14 @@ public class DebugInfo : MonoBehaviour
     }
     void Update()
     {
+        if (pc == null)
+        {
+            pc = FindFirstObjectByType<PlayerController>();
+        }
+        if (pc == null)
+        {
+            return;
+        }
         string request_string = "None";
         if (pc.request != null)
         {
@@ -25,7 +33,7 @@ public class DebugInfo : MonoBehaviour
             if (pc.request is InteractableClickRequest icr)
             {
                 request_string = $"INTERACTABLE CLICK ({icr.clickedInteractable.gameObject.name})";
-            }       
+            }
         }
 
         Vector2 player_tile = WorldGrid.instance.WorldLocationToGrid(pc.gameObject.transform.position);

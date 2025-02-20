@@ -27,7 +27,6 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-        DontDestroyOnLoad(this.gameObject);
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 

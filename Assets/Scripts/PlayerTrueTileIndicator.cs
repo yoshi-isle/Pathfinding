@@ -8,7 +8,6 @@ public class PlayerTrueTileIndicator : MonoBehaviour
     void Start()
     {
         TickCounter.Instance.OnTick += OnTick;
-        DontDestroyOnLoad(this.gameObject);
     }
 
     private void OnTick()
