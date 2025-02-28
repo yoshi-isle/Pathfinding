@@ -26,7 +26,6 @@ public class TickCounter : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(0.42f);
-            GameManager.SaveGame();
             OnTick?.Invoke();
         }
     }

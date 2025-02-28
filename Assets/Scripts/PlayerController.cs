@@ -59,7 +59,6 @@ public class PlayerController : MonoBehaviour
     {
         // TODO
         GameManager.SavePlayerPosition(GridLocation);
-        GameManager.SaveGame();
 
         // Process requests
         ProcessPreTickRequest();
@@ -189,6 +188,13 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        Debug.Log("Application is quitting. Saving game...");
+        GameManager.SavePlayerPosition(GridLocation);
+        GameManager.SaveGame();
     }
 }
 
