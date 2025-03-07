@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
-    // TODO - Default to 4 directions
-    [SerializeField] private List<Vector2> InteractLocationsRelative;
+    [SerializeField] private List<Vector2> InteractLocationsRelative = new List<Vector2>
+    {
+        new Vector2(1, 0),
+        new Vector2(-1, 0),
+        new Vector2(0, 1),
+        new Vector2(0, -1)
+    };
     public int InteractRadius;
     public string InteractName;
     public string InteractDescription;

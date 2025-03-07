@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     public Camera Camera;
     public PlayerState playerState;
     public bool Run;
+    public int AttackCooldown = 0;
+    public Enemy AttackTarget;
     public enum PlayerState
     {
         Normal,
@@ -73,6 +75,10 @@ public class PlayerController : MonoBehaviour
                     print($"Reached an interact location for {targetInteractable.gameObject.name}");
                     targetInteractable.Interact();
                     targetInteractable = null;
+                    if (targetInteractable is Enemy)
+                    {
+                        AttackTarget = (Enemy)targetInteractable;
+                    }
                 }
             }
         }

@@ -45,6 +45,7 @@ public class DebugInfo : MonoBehaviour
         Target Tile: {pc.targetTile}
         Hovered Interactable: {pc.hoveredInteractable}
         Target Interactable: {pc.targetInteractable}
+        Attack Target: {pc.AttackTarget}
         ";
 
     }
