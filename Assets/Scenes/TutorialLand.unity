@@ -1587,6 +1587,9 @@ MonoBehaviour:
   InteractName: Cube Slime
   InteractDescription: Attack
   AggroTowardsPlayer: 0
+  CurrentState: 0
+  ShowHpBar: 0
+  AttackRange: 4
 --- !u!1 &2035446667
 GameObject:
   m_ObjectHideFlags: 0
