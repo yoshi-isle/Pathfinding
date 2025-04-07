@@ -6,7 +6,7 @@ public class TickCounter : MonoBehaviour
 {
     public delegate void TickEventHandler();
     public static TickCounter Instance { get; private set; }
-    public event Action OnTick;
+    public event Action OnTick, EndTick;
 
     void Awake()
     {

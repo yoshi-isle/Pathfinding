@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     public bool Run;
     public int AttackCooldown = 0;
     public Enemy AttackTarget;
+    Inventory inventory;
     public enum PlayerState
     {
         Normal,
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
         TickCounter.Instance.OnTick += OnTick;
         Interactable.InteractableMouseHover += InteractableMouseHover;
         Interactable.InteractableMouseExit += InteractableMouseExit;
+        inventory = new Inventory();
     }
 
     void Update()
@@ -200,6 +202,7 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log("Application is quitting. Saving game...");
         GameManager.SavePlayerPosition(GridLocation);
+        GameManager.SavePlayerInventory(inventory);
         GameManager.SaveGame();
     }
 }

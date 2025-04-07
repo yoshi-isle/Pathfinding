@@ -11,10 +11,12 @@ public static class GameManager
     {
         public int NumberOfRoomsExplored;
         public Vector2 GridLocation;
+        public Inventory inventory;
         public PlayerData()
         {
             NumberOfRoomsExplored = 0;
             GridLocation = Vector2.zero;
+            inventory = new Inventory();
         }
     }
 
@@ -69,6 +71,11 @@ public static class GameManager
         {
             Debug.LogError($"Failed to delete save file: {e.Message}");
         }
+    }
+
+    public static void SavePlayerInventory(Inventory inventory)
+    {
+        currentPlayerData.inventory = inventory;
     }
 
     public static void SavePlayerPosition(Vector2 gridLocation)

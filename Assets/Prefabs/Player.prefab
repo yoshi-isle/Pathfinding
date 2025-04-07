@@ -51,7 +51,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6174051511377438990}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -127,8 +127,11 @@ MonoBehaviour:
   DrawGizmos: 1
   hoveredInteractable: {fileID: 0}
   targetInteractable: {fileID: 0}
+  Camera: {fileID: 0}
   playerState: 0
   Run: 0
+  AttackCooldown: 0
+  AttackTarget: {fileID: 0}
 --- !u!114 &6083195518978512194
 MonoBehaviour:
   m_ObjectHideFlags: 0

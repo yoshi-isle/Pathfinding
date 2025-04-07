@@ -3,28 +3,33 @@ using UnityEngine;
 public class PlayerGraphicsController : MonoBehaviour
 {
     public Transform follow;
-    Vector3 velocity;
     public float smoothTime = 0.2f;
     public Animator animator;
     public bool ShowHpBar = true;
+    private Vector3 velocity;
 
     void Update()
     {
-        float movementSpeed = velocity.magnitude / Time.deltaTime;
-        animator.SetFloat("MovementSpeed", movementSpeed);
-        animator.SetBool("Run", FindAnyObjectByType<PlayerController>().Run);
-        transform.position = Vector3.SmoothDamp(transform.position, follow.transform.position, ref velocity, smoothTime);
+        // Reference to player controller
+        PlayerController playerController = FindAnyObjectByType<PlayerController>();
 
-        // If the vector difference is still a "considerable" distance still rotate
-        if (Vector3.Distance(velocity, Vector3.zero) > 0.1f)
+        // Update movement speed for animation
+        float movementSpeed = velocity.magnitude; // No need to divide by deltaTime
+        animator.SetFloat("MovementSpeed", movementSpeed);
+        animator.SetBool("Run", playerController.Run);
+
+        // Smoothly move towards the follow position
+        Vector3 targetPosition = follow.transform.position;
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+
+        // Compute movement direction
+        Vector3 direction = targetPosition - transform.position;
+        direction.y = 0; // Keep rotation flat
+
+        // Only rotate if moving
+        if (direction.sqrMagnitude > 0.01f)
         {
-            Vector3 direction = new Vector3(velocity.x, 0, velocity.z);
-            transform.rotation = Quaternion.LookRotation(direction);
-        }
-        // Otherwise we will snap towards it
-        else
-        {
-            velocity = Vector3.zero;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 10f);
         }
     }
 
