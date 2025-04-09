@@ -1,3 +1,4 @@
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,6 +47,10 @@ public class DebugInfo : MonoBehaviour
         Hovered Interactable: {pc.hoveredInteractable}
         Target Interactable: {pc.targetInteractable}
         Attack Target: {pc.AttackTarget}
+        Attack Cooldown: {pc.AttackCooldown}
+        Run Mode: {pc.Run}
+        Inventory Capacity: {pc.inventory.Capacity}
+        Inventory Items: {string.Join(", ", pc.inventory.Backpack.Where(item => item != null).Select(item => $"{item.Name}({item.Quantity})"))}
         ";
 
     }

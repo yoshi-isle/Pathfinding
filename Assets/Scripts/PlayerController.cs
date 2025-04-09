@@ -15,10 +15,10 @@ public class PlayerController : MonoBehaviour
     public static event Action<Vector3> WorldClick;
     public Camera Camera;
     public PlayerState playerState;
-    public bool Run;
+    public bool Run = true;
     public int AttackCooldown = 0;
     public Enemy AttackTarget;
-    Inventory inventory;
+    public Inventory inventory;
     public enum PlayerState
     {
         Normal,
