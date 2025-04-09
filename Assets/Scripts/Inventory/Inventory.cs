@@ -2,25 +2,33 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class Inventory : MonoBehaviour
-{
-    public int Capacity { get; set; }
-    public Dictionary<int, Item?> Backpack { get; set; }
-    public Dictionary<int, Item?> Equipment { get; set; }
+#nullable enable
 
-    public Inventory()
+[Serializable]
+public class Inventory
+{
+    public int Capacity;
+    public List<Item> Backpack;
+
+    public Inventory(int capacity)
     {
-        Backpack = new Dictionary<int, Item?>();
-        Equipment = new Dictionary<int, Item?>();
+        Capacity = capacity;
+        Backpack = new List<Item>();
+
         for (int i = 0; i < Capacity; i++)
         {
-            Backpack.Add(i, null);
+            Backpack.Add(null);
         }
 
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 2; i++)
         {
-            Equipment.Add(i, null);
+            Backpack.Add(new Item { Name = $"Test item {i}", Stackable = false });
         }
+    }
+
+    public Inventory(int capacity, List<Item> inventory)
+    {
+        Capacity = capacity;
+        Backpack = inventory;
     }
 }

@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
         TickCounter.Instance.OnTick += OnTick;
         Interactable.InteractableMouseHover += InteractableMouseHover;
         Interactable.InteractableMouseExit += InteractableMouseExit;
-        inventory = new Inventory();
+        inventory = new Inventory(12);
     }
 
     void Update()

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public static class GameManager
@@ -16,7 +17,7 @@ public static class GameManager
         {
             NumberOfRoomsExplored = 0;
             GridLocation = Vector2.zero;
-            inventory = new Inventory();
+            inventory = new Inventory(12);
         }
     }
 
@@ -76,6 +77,7 @@ public static class GameManager
     public static void SavePlayerInventory(Inventory inventory)
     {
         currentPlayerData.inventory = inventory;
+        SaveGame();
     }
 
     public static void SavePlayerPosition(Vector2 gridLocation)
@@ -96,5 +98,14 @@ public static class GameManager
     public static Vector2 LoadPlayerPosition()
     {
         return currentPlayerData.GridLocation;
+    }
+
+    public static Inventory LoadPlayerInventory()
+    {
+        if (currentPlayerData.inventory != null)
+        {
+            return new Inventory(currentPlayerData.inventory.Capacity, currentPlayerData.inventory.Backpack);
+        }
+        return new Inventory(12);
     }
 }
