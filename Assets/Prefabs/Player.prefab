@@ -129,12 +129,17 @@ MonoBehaviour:
   targetInteractable: {fileID: 0}
   Camera: {fileID: 0}
   playerState: 0
-  Run: 0
+  Run: 1
   AttackCooldown: 0
   AttackTarget: {fileID: 0}
   inventory:
     Capacity: 0
     Backpack: []
+  InteractLocationsRelative:
+  - {x: 1, y: 0}
+  - {x: -1, y: 0}
+  - {x: 0, y: 1}
+  - {x: 0, y: -1}
 --- !u!114 &6083195518978512194
 MonoBehaviour:
   m_ObjectHideFlags: 0

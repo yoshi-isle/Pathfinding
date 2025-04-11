@@ -19,6 +19,13 @@ public class PlayerController : MonoBehaviour
     public int AttackCooldown = 0;
     public Enemy AttackTarget;
     public Inventory inventory;
+    [SerializeField] private List<Vector2> InteractLocationsRelative = new List<Vector2>
+    {
+        new Vector2(1, 0),
+        new Vector2(-1, 0),
+        new Vector2(0, 1),
+        new Vector2(0, -1)
+    };
     public enum PlayerState
     {
         Normal,
@@ -172,6 +179,16 @@ public class PlayerController : MonoBehaviour
     private void InteractableMouseHover(Interactable interactable)
     {
         hoveredInteractable = interactable;
+    }
+
+    public List<Vector3> GetWorldInteractionLocations()
+    {
+        var worldInteractionLocations = new List<Vector3>();
+        foreach (var location in InteractLocationsRelative)
+        {
+            worldInteractionLocations.Add(new(location.x + transform.position.x, transform.position.y, location.y + transform.position.z));
+        }
+        return worldInteractionLocations;
     }
 
     void OnDrawGizmos()

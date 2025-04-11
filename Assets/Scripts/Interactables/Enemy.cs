@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Enemy : Interactable
@@ -12,8 +13,10 @@ public class Enemy : Interactable
         Aggro
     }
     GameObject player;
+    public Stack<Vector2> currentPath;
     public bool ShowHpBar = false;
     public int AttackRange = 0;
+    public Vector2? targetTile = null;
     public Vector2 GridLocation => new(transform.position.x, transform.position.z);
 
     public List<Vector2> GetTilesInScoutRange()
@@ -39,9 +42,7 @@ public class Enemy : Interactable
 
     public void OnTick()
     {
-        print("Checking attack range");
         // TODO - Inefficient - use physics or precise colliders(?)
-
         bool found = false;
         foreach (Vector2 tile in GetTilesInScoutRange())
         {
@@ -53,19 +54,53 @@ public class Enemy : Interactable
 
         if (found)
         {
-            print("Player is in range. now im angy");
             SetAggressive();
         }
         else
         {
-            print("Player is gone. not angy anymore");
             SetPatrol();
+        }
+
+        switch (CurrentState)
+        {
+            case EnemyState.Patrol:
+                break;
+            case EnemyState.Aggro:
+                // TODO - Path to each. May not be efficient
+                var pathsToPlayer = new List<Stack<Vector2>>();
+                foreach (var possibleLocation in player.GetComponent<PlayerController>().GetWorldInteractionLocations())
+                {
+                    var path = AStarPathfinder.FindPath(GridLocation, new Vector2(possibleLocation.x, possibleLocation.z));
+                    if (path.Count() != 0)
+                    {
+                        pathsToPlayer.Add(path);
+                    }
+                }
+                var shortestPath = pathsToPlayer.OrderBy(path => path.Count).FirstOrDefault();
+                if (shortestPath != null)
+                {
+                    currentPath = shortestPath;
+                }     
+
+                // Move along path if we're not at the target
+                if (currentPath.Count == 0)
+                {
+                    targetTile = WorldGrid.instance.WorldLocationToGrid(transform.position);
+                }
+
+                if (currentPath != null && currentPath.Count > 1)
+                {
+                    currentPath.Pop();
+                    transform.position = new Vector3(currentPath.Peek().x, transform.position.y, currentPath.Peek().y);
+                }
+                break;
+            default:
+                break;
         }
     }
 
     public void Start()
     {
-        //TODO
         player = GameObject.FindGameObjectWithTag("Player");
 
         TickCounter.Instance.OnTick += OnTick;
@@ -86,6 +121,7 @@ public class Enemy : Interactable
 
     public void SetAggressive()
     {
+        CurrentState = EnemyState.Aggro;
         ShowHpBar = true;
         AggroTowardsPlayer = true;
         Renderer renderer = GetComponent<Renderer>();
@@ -97,6 +133,7 @@ public class Enemy : Interactable
 
     private void SetPatrol()
     {
+        CurrentState = EnemyState.Patrol;
         ShowHpBar = false;
         AggroTowardsPlayer = true;
         Renderer renderer = GetComponent<Renderer>();
