@@ -4,6 +4,12 @@ using System;
 public class Item
 {
     public string Name;
-    public bool Stackable;
-    public int Quantity;
+    public int MaxQuantity;
+    public bool IsStackable => MaxQuantity > 1;
+
+    public Item(string name, int maxQuantity)
+    {
+        Name = name;
+        MaxQuantity = maxQuantity;
+    }
 }

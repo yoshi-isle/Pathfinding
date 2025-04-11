@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public static class GameManager
@@ -10,12 +9,10 @@ public static class GameManager
     [Serializable]
     public class PlayerData
     {
-        public int NumberOfRoomsExplored;
         public Vector2 GridLocation;
         public Inventory inventory;
         public PlayerData()
         {
-            NumberOfRoomsExplored = 0;
             GridLocation = Vector2.zero;
             inventory = new Inventory(12);
         }
@@ -85,16 +82,6 @@ public static class GameManager
         currentPlayerData.GridLocation = gridLocation;
     }
 
-    public static void IncrementRoomsExplored()
-    {
-        currentPlayerData.NumberOfRoomsExplored++;
-    }
-
-    public static int LoadRoomsExplored()
-    {
-        return currentPlayerData.NumberOfRoomsExplored;
-    }
-
     public static Vector2 LoadPlayerPosition()
     {
         return currentPlayerData.GridLocation;
@@ -102,10 +89,7 @@ public static class GameManager
 
     public static Inventory LoadPlayerInventory()
     {
-        if (currentPlayerData.inventory != null)
-        {
-            return new Inventory(currentPlayerData.inventory.Capacity, currentPlayerData.inventory.Backpack);
-        }
-        return new Inventory(12);
+        var inventory = new Inventory(currentPlayerData.inventory.Capacity, currentPlayerData.inventory.Backpack);
+        return inventory;
     }
 }

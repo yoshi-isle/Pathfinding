@@ -50,7 +50,6 @@ public class DebugInfo : MonoBehaviour
         Attack Cooldown: {pc.AttackCooldown}
         Run Mode: {pc.Run}
         Inventory Capacity: {pc.inventory.Capacity}
-        Inventory Items: {string.Join(", ", pc.inventory.Backpack.Where(item => item != null).Select(item => $"{item.Name}({item.Quantity})"))}
         ";
 
     }

@@ -27,7 +27,7 @@ public class GameLoader : MonoBehaviour
         playerGfx.GetComponent<PlayerGraphicsController>().follow = player.transform;
         camera.GetComponent<CameraController>().target = playerGfx.transform;
         player.GetComponent<PlayerController>().Camera = camera.GetComponent<Camera>();
-        GameManager.IncrementRoomsExplored();
+        player.GetComponent<PlayerController>().inventory = GameManager.LoadPlayerInventory();
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

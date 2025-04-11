@@ -31,11 +31,15 @@ public class PlayerController : MonoBehaviour
         TickCounter.Instance.OnTick += OnTick;
         Interactable.InteractableMouseHover += InteractableMouseHover;
         Interactable.InteractableMouseExit += InteractableMouseExit;
-        inventory = new Inventory(12);
     }
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            inventory.PickupItem(ItemIndex.Items[1], 1);
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             if (Physics.Raycast(Camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
@@ -61,10 +65,6 @@ public class PlayerController : MonoBehaviour
 
     private void OnTick()
     {
-        // TODO
-        GameManager.SavePlayerPosition(GridLocation);
-
-        // Process requests
         ProcessPreTickRequest();
 
         // Check if at interactable

@@ -20,7 +20,6 @@ public class Ladder : Interactable
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        GameManager.IncrementRoomsExplored();
         SceneManager.sceneLoaded -= OnSceneLoaded;
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
