@@ -1,29 +1,27 @@
-using System;
-using System.Linq;
 using UnityEngine;
 
 public class PlayerTargetTileIndicator : MonoBehaviour
 {
-    public PlayerController pc;
+    PlayerController pc;
+    Vector2 target;
 
     void Start()
     {
         pc = FindFirstObjectByType<PlayerController>();
+        WorldClickRequest.WorldClickEvent += WorldClickEvent;
+    }
+
+    private void WorldClickEvent(WorldClickRequest request)
+    {
+        target = new Vector2(request.X, request.Y);
     }
 
     private void Update()
     {
-        if (pc.targetTile == null)
-        {
-            return;
-        }
-
-        Vector2 target = (Vector2)pc.targetTile;
-
         transform.position = new(target.x, 0.03f, target.y);
         if (transform.position.x == pc.transform.position.x && transform.position.z == pc.transform.position.z)
         {
-            //temp
+            //TODO - On/Off
             transform.position = Vector3.zero;
         }
     }

@@ -51,7 +51,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6174051511377438990}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -132,6 +132,9 @@ MonoBehaviour:
   Run: 0
   AttackCooldown: 0
   AttackTarget: {fileID: 0}
+  inventory:
+    Capacity: 0
+    Backpack: []
 --- !u!114 &6083195518978512194
 MonoBehaviour:
   m_ObjectHideFlags: 0
