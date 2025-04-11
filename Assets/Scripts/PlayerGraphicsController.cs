@@ -7,26 +7,26 @@ public class PlayerGraphicsController : MonoBehaviour
     public Animator animator;
     public bool ShowHpBar = true;
     private Vector3 velocity;
+    PlayerController playerController = null;
 
     void Update()
     {
-        // Reference to player controller
-        PlayerController playerController = FindAnyObjectByType<PlayerController>();
+        if (playerController == null)
+        {
+            playerController = FindAnyObjectByType<PlayerController>();
+            return;
+        }
 
-        // Update movement speed for animation
-        float movementSpeed = velocity.magnitude; // No need to divide by deltaTime
+        float movementSpeed = velocity.magnitude;
         animator.SetFloat("MovementSpeed", movementSpeed);
         animator.SetBool("Run", playerController.Run);
 
-        // Smoothly move towards the follow position
         Vector3 targetPosition = follow.transform.position;
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
 
-        // Compute movement direction
         Vector3 direction = targetPosition - transform.position;
-        direction.y = 0; // Keep rotation flat
+        direction.y = 0;
 
-        // Only rotate if moving
         if (direction.sqrMagnitude > 0.01f)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 10f);
@@ -41,16 +41,11 @@ public class PlayerGraphicsController : MonoBehaviour
             Vector3 hpBarPosition = camera.WorldToScreenPoint(transform.position + new Vector3(0, 1.5f, 0));
             float hpBarWidth = 30;
             float hpBarHeight = 5;
-            float currentHp = 80;
-            float maxHp = 100;
 
-            // Draw background (depleted health)
             GUI.color = Color.red;
             GUI.DrawTexture(new Rect(hpBarPosition.x - hpBarWidth / 2, Screen.height - hpBarPosition.y - hpBarHeight / 2, hpBarWidth, hpBarHeight), Texture2D.whiteTexture);
-
-            // Draw foreground (current health)
             GUI.color = Color.green;
-            GUI.DrawTexture(new Rect(hpBarPosition.x - hpBarWidth / 2, Screen.height - hpBarPosition.y - hpBarHeight / 2, hpBarWidth * (currentHp / maxHp), hpBarHeight), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(hpBarPosition.x - hpBarWidth / 2, Screen.height - hpBarPosition.y - hpBarHeight / 2, hpBarWidth * (playerController.currentHp / playerController.maxHp), hpBarHeight), Texture2D.whiteTexture);
         }
     }
 }

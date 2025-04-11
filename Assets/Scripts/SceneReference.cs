@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System;
 
-[System.Serializable]
+[Serializable]
 public class SceneReference
 {
     [SerializeField]

@@ -17,8 +17,11 @@ public class PlayerController : MonoBehaviour
     public PlayerState playerState;
     public bool Run = true;
     public int AttackCooldown = 0;
+    public int CurrentAttackSpeed = 4;
     public Enemy AttackTarget;
     public Inventory inventory;
+    public float currentHp = 100;
+    public float maxHp = 100;
     [SerializeField] private List<Vector2> InteractLocationsRelative = new List<Vector2>
     {
         new Vector2(1, 0),
@@ -83,11 +86,11 @@ public class PlayerController : MonoBehaviour
                 {
                     print($"Reached an interact location for {targetInteractable.gameObject.name}");
                     targetInteractable.Interact();
-                    targetInteractable = null;
                     if (targetInteractable is Enemy)
                     {
                         AttackTarget = (Enemy)targetInteractable;
                     }
+                    targetInteractable = null;
                 }
             }
         }
