@@ -3,46 +3,44 @@ using UnityEngine;
 
 public class WorldGrid : MonoBehaviour
 {
-    public Vector2 gridSize;
+    public Vector2Int gridSize = new Vector2Int(300, 300); // Use Vector2Int for integer grid
+    public int chunkSize = 16; // Size of each chunk
     public static WorldGrid instance;
-    public Dictionary<Vector2, TileInfo> Map { get; set; }
+    // Chunks: Dictionary<chunkPos, Dictionary<tilePos, TileInfo>>
+    private Dictionary<Vector2Int, Dictionary<Vector2Int, TileInfo>> chunks = new();
+    public int gizmoDrawRadius = 10; // Only draw tiles near player
 
     void Awake()
     {
         instance = this;
     }
 
-    void Start()
+    // Lazy tile access
+    public TileInfo GetTile(Vector2Int gridPos)
     {
-        BakeMap();
+        Vector2Int chunkPos = new Vector2Int(gridPos.x / chunkSize, gridPos.y / chunkSize);
+        Vector2Int localPos = new Vector2Int(gridPos.x % chunkSize, gridPos.y % chunkSize);
+        if (localPos.x < 0) localPos.x += chunkSize;
+        if (localPos.y < 0) localPos.y += chunkSize;
+        if (!chunks.TryGetValue(chunkPos, out var chunk))
+        {
+            chunk = new Dictionary<Vector2Int, TileInfo>();
+            chunks[chunkPos] = chunk;
+        }
+        if (!chunk.TryGetValue(localPos, out var tile))
+        {
+            tile = new TileInfo { Walkable = Walkable(new Vector2(gridPos.x, gridPos.y)) };
+            chunk[localPos] = tile;
+        }
+        return tile;
     }
 
-    void BakeMap()
+    public bool InBoundsAndWalkable(Vector2 worldLocation)
     {
-        Map = new();
-
-        for (int x = 0; x < gridSize.x; x++)
-        {
-            for (int y = 0; y < gridSize.y; y++)
-            {
-                var tile = new TileInfo
-                {
-                    Walkable = Walkable(new(x, y))
-                };
-
-                Map.Add(new(x, y), tile);
-            }
-        }
-    }
-
-    void OnDrawGizmos()
-    {
-        if (Map == null || Map.Count == 0) return;
-        foreach (var item in Map)
-        {
-            Gizmos.color = item.Value.Walkable ? Color.white : Color.red;
-            Gizmos.DrawCube(new(item.Key.x, 0, item.Key.y), Vector3.one * 0.5f);
-        }
+        Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(worldLocation.x), Mathf.RoundToInt(worldLocation.y));
+        if (gridPos.x < 0 || gridPos.y < 0 || gridPos.x >= gridSize.x || gridPos.y >= gridSize.y)
+            return false;
+        return GetTile(gridPos).Walkable;
     }
 
     public bool Walkable(Vector2 worldLocation)
@@ -57,18 +55,30 @@ public class WorldGrid : MonoBehaviour
         );
     }
 
-
-    public bool InBoundsAndWalkable(Vector2 worldLocation)
+    public Vector2Int WorldLocationToGrid(Vector3 worldLocation)
     {
-        if (Map == null || Map.Count == 0 || !Map.ContainsKey(new(worldLocation.x, worldLocation.y))) return false;
-        var hi = Map[new(worldLocation.x, worldLocation.y)].Walkable;
-        return Map[new(worldLocation.x, worldLocation.y)].Walkable;
+        return new Vector2Int(Mathf.RoundToInt(worldLocation.x), Mathf.RoundToInt(worldLocation.z));
     }
 
-    // TODO - Move
-    public Vector2 WorldLocationToGrid(Vector3 worldLocation)
+    void OnDrawGizmos()
     {
-        return new Vector2(Mathf.Round(worldLocation.x), Mathf.Round(worldLocation.z));
+        if (Application.isPlaying && instance != null)
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player == null) return;
+            Vector2Int playerGrid = WorldLocationToGrid(player.transform.position);
+            for (int x = -gizmoDrawRadius; x <= gizmoDrawRadius; x++)
+            {
+                for (int y = -gizmoDrawRadius; y <= gizmoDrawRadius; y++)
+                {
+                    Vector2Int pos = playerGrid + new Vector2Int(x, y);
+                    if (pos.x < 0 || pos.y < 0 || pos.x >= gridSize.x || pos.y >= gridSize.y) continue;
+                    var tile = GetTile(pos);
+                    Gizmos.color = tile.Walkable ? Color.white : Color.red;
+                    Gizmos.DrawCube(new Vector3(pos.x, 0, pos.y), Vector3.one * 0.5f);
+                }
+            }
+        }
     }
 
     public Dictionary<Vector2, Vector2> GetRunCollisionTravelRules => new() {
